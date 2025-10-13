@@ -1,35 +1,35 @@
+import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 import React from 'react';
 
-import { HapticTab } from '@/components/haptic-tab';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
+export default function TabsLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
-        tabBarButton: HapticTab,
+        tabBarStyle: {
+          backgroundColor: '#0D1140',
+          borderTopColor: 'transparent',
+          height: 66,
+          paddingBottom: 8,
+          paddingTop: 6,
+          borderTopLeftRadius: 12,
+          borderTopRightRadius: 12,
+          position: 'absolute',
+          left: 8,
+          right: 8,
+          bottom: 10,
+        },
+        tabBarActiveTintColor: '#fff',
+        tabBarInactiveTintColor: '#9aa0c7',
+        tabBarLabelStyle: { fontSize: 12, marginBottom: 4 },
+        tabBarIconStyle: { marginBottom: -4 },
+        tabBarHideOnKeyboard: true,
       }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="explore"
-        options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
-        }}
-      />
-    </Tabs>
+      <Tabs.Screen name="home" options={{ title: 'Home', tabBarIcon: ({ color }) => <MaterialIcons name="home" size={22} color={color} /> }} />
+      <Tabs.Screen name="timetable" options={{ title: 'Timetable', tabBarIcon: ({ color }) => <MaterialIcons name="event" size={22} color={color} /> }} />
+      <Tabs.Screen name="modules" options={{ title: 'Modules', tabBarIcon: ({ color }) => <MaterialCommunityIcons name="book-open-variant" size={22} color={color} /> }} />
+      <Tabs.Screen name="explore" options={{ title: 'Explore', tabBarIcon: ({ color }) => <MaterialIcons name="explore" size={22} color={color} /> }} />
+     </Tabs>
   );
 }

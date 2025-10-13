@@ -1,3 +1,20 @@
+UOG - University of Greenwich (Expo)
+
+This project is an Expo React Native app scaffolded to run inside Expo Go.
+
+Setup
+
+1. Install dependencies:
+
+   npm install
+
+2. Start Expo and open in Expo Go on your device or emulator:
+
+   npx expo start
+
+Notes
+- The app uses `expo-router`, `react-native-reanimated`, and `@expo/vector-icons`.
+- If `react-native-reanimated` throws errors, make sure Metro is restarted and the Babel plugin is enabled in `babel.config.js`.
 # Welcome to your Expo app 👋
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).

@@ -30,12 +30,12 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 200,
+          "image": "./assets/images/uog_logo.png",
+          "imageWidth": 300,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff",
+          "backgroundColor": "#0D1140",
           "dark": {
-            "backgroundColor": "#000000"
+            "backgroundColor": "#0D1140"
           }
         }
       ]
@@ -44,5 +44,12 @@
       "typedRoutes": true,
       "reactCompiler": true
     }
+    ,
+    "splash": {
+      "image": "./assets/uog_logo.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0D1140"
+    },
+    "backgroundColor": "#0D1140"
   }
 }
