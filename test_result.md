@@ -330,3 +330,5 @@ test_plan:
 agent_communication:
   - agent: "main"
     message: "Complete University of Greenwich app MVP built with all features. Backend has been tested manually for auth and AI chatbot. Now needs comprehensive backend testing for all endpoints including timetable, grades, library, and attendance. Authentication is working - use username: testuser, password: test123 for testing."
+  - agent: "testing"
+    message: "Comprehensive backend testing completed successfully. Created backend_test.py and executed 17 test cases covering all API endpoints. All tests passed with 100% success rate. Authentication (register/login/me), timetable management, grades management, library search, QR attendance marking, AI chatbot, and news endpoints are all working correctly. Backend is fully functional and ready for production use."
