@@ -101,3 +101,220 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: "Build a comprehensive University of Greenwich mobile app with authentication, student portal, campus maps, QR attendance scanner, library search, and AI chatbot assistant."
+
+backend:
+  - task: "User Authentication (JWT)"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Register and login endpoints tested successfully with curl. Token generation working."
+  
+  - task: "Student Timetable Management"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "GET and POST endpoints created for timetable. Needs testing."
+  
+  - task: "Grades Management"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "GET and POST endpoints created for grades. Needs testing."
+  
+  - task: "News & Events Feed"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "News endpoint tested via seed data. Working correctly."
+  
+  - task: "Library Book Search"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Library search with query parameter implemented. Needs testing."
+  
+  - task: "QR Code Attendance Marking"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "POST endpoint for attendance marking created. Needs testing with QR data."
+  
+  - task: "AI Chatbot Integration"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "AI chatbot tested with curl. Successfully integrated with Emergent LLM key using gpt-4o-mini. Responses are contextual and helpful."
+
+frontend:
+  - task: "Authentication Screens (Login/Register)"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/app/auth/"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Login and register screens created with form validation and error handling. Needs UI testing."
+  
+  - task: "Bottom Tab Navigation"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/app/(tabs)/_layout.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "5 tabs created: Home, Timetable, Campus, Library, Profile. Navigation structure in place."
+  
+  - task: "Home Dashboard with News"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/app/(tabs)/index.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Home screen with quick actions, news feed, and welcome header. Pull to refresh implemented."
+  
+  - task: "Timetable View"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/app/(tabs)/timetable.tsx"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Day-based timetable view with horizontal scroll for day selection. Displays classes with time, location, and campus."
+  
+  - task: "Campus Maps & Information"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/app/(tabs)/campus.tsx"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Campus selector with 3 campuses (Greenwich, Avery Hill, Medway). Map placeholder with 'Open in Maps' functionality. Campus info and facilities listed."
+  
+  - task: "Library Search"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/app/(tabs)/library.tsx"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Search input with real-time filtering. Book cards showing title, author, ISBN, location, and availability status."
+  
+  - task: "Profile with Grades & Attendance"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/app/(tabs)/profile.tsx"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Profile screen with user info, GPA calculator, grades list, attendance records, and logout button."
+  
+  - task: "QR Scanner Modal"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/app/qr-scanner.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "QR scanner with camera permissions, scan overlay, and attendance marking. Uses expo-barcode-scanner."
+  
+  - task: "AI Chatbot Modal"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/app/chatbot.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Chat interface with message history, typing indicator, and session management. Connected to backend AI endpoint."
+
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 0
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "User Authentication (JWT)"
+    - "AI Chatbot Integration"
+    - "QR Code Attendance Marking"
+    - "Student Timetable Management"
+    - "Library Book Search"
+  stuck_tasks: []
+  test_all: true
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "main"
+    message: "Complete University of Greenwich app MVP built with all features. Backend has been tested manually for auth and AI chatbot. Now needs comprehensive backend testing for all endpoints including timetable, grades, library, and attendance. Authentication is working - use username: testuser, password: test123 for testing."
