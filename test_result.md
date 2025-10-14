@@ -134,15 +134,18 @@ backend:
   
   - task: "Grades Management"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "GET and POST endpoints created for grades. Needs testing."
+      - working: true
+        agent: "testing"
+        comment: "Comprehensive testing completed. GET /api/grades returns user-specific grade records. POST /api/grades successfully adds new grades with proper validation. Grade data includes course name, grade, and credits."
   
   - task: "News & Events Feed"
     implemented: true
