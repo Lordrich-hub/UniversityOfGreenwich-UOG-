@@ -201,22 +201,24 @@ export default function Home() {
           )}
         />
 
-        {/* Carousel dots */}
-        <View style={[styles.dotsWrap, { width: winW, bottom: 16 }]}>
-          {HERO_SLIDES.map((_, i) => (
-            <TouchableOpacity
-              key={`dot-${i}`}
-              onPress={() => {
-                const target = VIRTUAL_START_INDEX + i;
-                currentIndexRef.current = target;
-                setActiveIndex(i);
-                heroRef.current?.scrollToIndex({ index: target, animated: true });
-              }}
-              style={[styles.dot, i === activeIndex && styles.dotActive]}
-              accessibilityRole="button"
-              accessibilityLabel={`Go to slide ${i + 1}`}
-            />
-          ))}
+        {/* Carousel indicators in the gap between hero and Latest */}
+        <View style={styles.dotsBetween}>
+          <View style={styles.dotRow}>
+            {HERO_SLIDES.map((_, i) => (
+              <TouchableOpacity
+                key={`dot-${i}`}
+                onPress={() => {
+                  const target = VIRTUAL_START_INDEX + i;
+                  currentIndexRef.current = target;
+                  setActiveIndex(i);
+                  heroRef.current?.scrollToIndex({ index: target, animated: true });
+                }}
+                style={[styles.dotBar, i === activeIndex && styles.dotBarActive]}
+                accessibilityRole="button"
+                accessibilityLabel={`Go to slide ${i + 1}`}
+              />
+            ))}
+          </View>
         </View>
 
         {/* Latest section - white background */}
@@ -291,10 +293,15 @@ const styles = StyleSheet.create({
   heroTitle: { color: '#fff', fontSize: 26, lineHeight: 30, fontWeight: '800', marginBottom: 6 },
   heroMeta: { color: '#c8cfee' },
   // Latest section - white background with dark blue text
-  latestSection: { backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, marginTop: 40, paddingTop: 32, paddingHorizontal: 16, paddingBottom: 24 },
+  latestSection: { backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, marginTop: 8, paddingTop: 32, paddingHorizontal: 16, paddingBottom: 24 },
   latestHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
   latestTitle: { fontSize: 28, fontWeight: '800', color: '#0D1140' },
   seeAllText: { fontSize: 16, fontWeight: '600', color: '#0D1140' },
+  // Dots between hero and Latest styled as small bars
+  dotsBetween: { paddingVertical: 10, alignItems: 'center' },
+  dotRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 14 },
+  dotBar: { width: 24, height: 3, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.35)' },
+  dotBarActive: { width: 32, height: 3.5, borderRadius: 2, backgroundColor: '#fff' },
   // Featured large card
   featuredCard: { backgroundColor: '#f8f9fb', borderRadius: 16, marginBottom: 16, overflow: 'hidden' },
   featuredImage: { width: '100%', height: 220 },
