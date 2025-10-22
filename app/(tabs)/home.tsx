@@ -219,6 +219,14 @@ export default function Home() {
           ))}
         </View>
 
+        {/* Fade transition from hero to Latest */}
+        <LinearGradient
+          colors={['rgba(13,17,64,1)', 'rgba(13,17,64,0.5)', 'rgba(255,255,255,0)']}
+          locations={[0, 0.4, 1]}
+          style={{ height: 60, marginTop: -40 }}
+          pointerEvents="none"
+        />
+
         {/* Latest section - white background */}
         <View style={styles.latestSection}>
           <View style={styles.latestHeader}>
@@ -291,7 +299,7 @@ const styles = StyleSheet.create({
   heroTitle: { color: '#fff', fontSize: 26, lineHeight: 30, fontWeight: '800', marginBottom: 6 },
   heroMeta: { color: '#c8cfee' },
   // Latest section - white background with dark blue text
-  latestSection: { backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, marginTop: -20, paddingTop: 24, paddingHorizontal: 16, paddingBottom: 24 },
+  latestSection: { backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, marginTop: 20, paddingTop: 32, paddingHorizontal: 16, paddingBottom: 24 },
   latestHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
   latestTitle: { fontSize: 28, fontWeight: '800', color: '#0D1140' },
   seeAllText: { fontSize: 16, fontWeight: '600', color: '#0D1140' },
