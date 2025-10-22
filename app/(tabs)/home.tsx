@@ -1,5 +1,6 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { FlatList, Image, ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
@@ -27,6 +28,13 @@ export default function Home() {
   const buttonSize = 44;
   // The logo is translated down by extraOffset/2; shift buttons by same amount so they align
   const buttonTop = Math.round((headerHeight - buttonSize) / 2 + extraOffset / 2);
+
+  // Overlay tuning
+  const HERO_BLUR_INTENSITY = 26; // lower blur strength
+  const HERO_OVERLAY_HEIGHT = 132; // overlay height at bottom
+  // Gradient that fades in from transparent (top) to darker (bottom)
+  const HERO_GRADIENT_COLORS = ['rgba(13,17,64,0)', 'rgba(13,17,64,0.35)', 'rgba(13,17,64,0.7)'];
+  const HERO_GRADIENT_LOCATIONS = [0, 0.55, 1];
 
   const HERO_SLIDES = useMemo(() => ([
     {
@@ -126,7 +134,13 @@ export default function Home() {
               <ImageBackground source={item.image} style={StyleSheet.absoluteFill} resizeMode="cover" />
               {/* Bottom overlay with blur */}
               <View style={styles.heroOverlayWrap}>
-                <BlurView intensity={40} tint="dark" style={styles.heroBlur} />
+                <BlurView intensity={HERO_BLUR_INTENSITY} tint="dark" style={[styles.heroBlur, { height: HERO_OVERLAY_HEIGHT }]} />
+                <LinearGradient
+                  colors={HERO_GRADIENT_COLORS}
+                  locations={HERO_GRADIENT_LOCATIONS}
+                  style={[styles.heroGradient, { height: HERO_OVERLAY_HEIGHT }]}
+                  pointerEvents="none"
+                />
                 <TouchableOpacity
                   activeOpacity={0.9}
                   style={styles.heroTextArea}
@@ -202,7 +216,8 @@ const styles = StyleSheet.create({
   hero: { width: '100%' },
   heroSlide: { width: '100%', overflow: 'hidden' },
   heroOverlayWrap: { position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: 16, paddingBottom: 16 },
-  heroBlur: { ...StyleSheet.absoluteFillObject, borderTopLeftRadius: 16, borderTopRightRadius: 16, height: 132 },
+  heroBlur: { ...StyleSheet.absoluteFillObject, borderTopLeftRadius: 16, borderTopRightRadius: 16 },
+  heroGradient: { ...StyleSheet.absoluteFillObject, borderTopLeftRadius: 16, borderTopRightRadius: 16 },
   heroTextArea: { padding: 16 },
   heroBadge: { color: '#fff', backgroundColor: 'rgba(255,255,255,0.08)', alignSelf: 'flex-start', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 16, marginBottom: 10 },
   heroTitle: { color: '#fff', fontSize: 20, fontWeight: '800', marginBottom: 6 },
