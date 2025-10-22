@@ -9,7 +9,7 @@ const GAP_UNDER_UOG_LOGO = 48;
 // Greenwich-LOGO_writng_only.png visual height
 const GREENWICH_TEXT_LOGO_HEIGHT = 104;
 
-// Optional: Debug guide to help align the top of the Greenwich text with a visible red line
+// Debug guide to help align the top of the Greenwich text with a visible red line
 // Set DEBUG_GUIDE to true to show the guide and pause auto-navigation
 const DEBUG_GUIDE = false; // set to true while aligning
 // Position of the red guide line from the top of the screen (in pixels)
