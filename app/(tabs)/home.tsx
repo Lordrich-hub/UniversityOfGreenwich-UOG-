@@ -1,4 +1,5 @@
 import { MaterialIcons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -127,12 +128,12 @@ export default function Home() {
       {/* Header with side buttons at edges and absolutely centered logo */}
   <View style={[styles.header, { paddingTop: (insets.top || 8) + extraOffset, height: (insets.top || 0) + 56 + extraOffset }]}> 
         {/* left edge button - absolutely positioned so center stays exact */}
-        <TouchableOpacity style={[styles.edgeLeft, { top: buttonTop, height: buttonSize, justifyContent: 'center' }]} onPress={() => alert('Scan (placeholder)')}> 
+  <TouchableOpacity style={[styles.edgeLeft, { top: buttonTop, height: buttonSize, justifyContent: 'center' }]} onPress={() => router.push('/scan')}> 
           <MaterialIcons name="qr-code-scanner" size={28} color="#fff" />
         </TouchableOpacity>
 
         {/* right edge button */}
-        <TouchableOpacity style={[styles.edgeRight, { top: buttonTop }]} onPress={() => alert('Profile (placeholder)')}> 
+  <TouchableOpacity style={[styles.edgeRight, { top: buttonTop }]} onPress={() => router.push('/profile')}> 
           <View style={[styles.avatar, { width: 44, height: 44, borderRadius: 22 }]}> 
             <Text style={styles.avatarText}>L</Text>
           </View>
@@ -162,10 +163,12 @@ export default function Home() {
           showsHorizontalScrollIndicator={false}
           initialScrollIndex={VIRTUAL_START_INDEX}
           getItemLayout={(_, index) => ({ length: winW, offset: winW * index, index })}
-          onMomentumScrollEnd={(e) => {
+          onMomentumScrollEnd={async (e) => {
             const idx = Math.round(e.nativeEvent.contentOffset.x / winW);
             currentIndexRef.current = idx;
             setActiveIndex(idx % SLIDE_COUNT);
+            // light haptic feedback when slide settles
+            try { await Haptics.selectionAsync(); } catch {}
             // Soft wrap-around: if too close to edges, jump back to middle quietly
             const EDGE_BUFFER = SLIDE_COUNT * 2;
             if (idx < EDGE_BUFFER || idx > VIRTUAL_COUNT - EDGE_BUFFER) {
@@ -225,7 +228,7 @@ export default function Home() {
         <View style={styles.latestSection}>
           <View style={styles.latestHeader}>
             <Text style={styles.latestTitle}>Latest</Text>
-            <TouchableOpacity onPress={() => alert('See all')}>
+            <TouchableOpacity onPress={() => router.push('/news')}>
               <Text style={styles.seeAllText}>See all  ›</Text>
             </TouchableOpacity>
           </View>
@@ -247,7 +250,7 @@ export default function Home() {
               <TouchableOpacity
                 key={item.id}
                 style={styles.smallCard}
-                onPress={() => router.push({ pathname: '/news/[id]', params: { id: item.id } })}
+                onPress={async () => { try { await Haptics.selectionAsync(); } catch {}; router.push({ pathname: '/news/[id]', params: { id: item.id } }); }}
               >
                 <Image source={item.image} style={styles.smallImage} resizeMode="cover" />
                 <View style={styles.smallContent}>
@@ -311,7 +314,7 @@ const styles = StyleSheet.create({
   // Small cards with image on right
   smallCard: { backgroundColor: '#f8f9fb', borderRadius: 12, marginBottom: 12, flexDirection: 'row', overflow: 'hidden', padding: 12 },
   smallImage: { width: 120, height: 100, borderRadius: 8 },
-  smallContent: { flex: 1, paddingRight: 12, justifyContent: 'center' },
+  smallContent: { flex: 1, paddingRight: 12, justifyContent: 'center', marginLeft: 12 },
   smallTitle: { fontSize: 16, fontWeight: '700', color: '#0D1140', marginBottom: 4 },
   smallSubtitle: { fontSize: 13, color: '#6b7280', marginBottom: 6 },
   smallCategory: { fontSize: 12, color: '#0D1140', fontWeight: '600', opacity: 0.6 },

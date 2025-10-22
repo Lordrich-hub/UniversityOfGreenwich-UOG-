@@ -107,12 +107,12 @@ For questions, contact the Student Finance Office.`,
         <View style={styles.categoryBadge}>
           <Text style={styles.categoryText}>{article.category}</Text>
         </View>
-        
+
         <Text style={styles.title}>{article.title}</Text>
         <Text style={styles.date}>{article.date}</Text>
 
-        <Image 
-          source={require('../../assets/images/UOG.png')} 
+        <Image
+          source={require('../../assets/images/UOG.png')}
           style={styles.heroImage}
           resizeMode="cover"
         />
@@ -126,7 +126,7 @@ For questions, contact the Student Finance Office.`,
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0D1140',
+    backgroundColor: '#fff',
   },
   header: {
     flexDirection: 'row',
@@ -152,28 +152,30 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   categoryBadge: {
-    backgroundColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: 'rgba(13,17,64,0.08)',
     alignSelf: 'flex-start',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(13,17,64,0.15)',
     marginTop: 16,
     marginBottom: 12,
   },
   categoryText: {
-    color: '#fff',
+    color: '#0D1140',
     fontSize: 12,
     fontWeight: '600',
   },
   title: {
-    color: '#fff',
+    color: '#0D1140',
     fontSize: 28,
     fontWeight: '800',
     marginBottom: 8,
     lineHeight: 36,
   },
   date: {
-    color: '#c8cfee',
+    color: '#46507a',
     fontSize: 14,
     marginBottom: 20,
   },
@@ -184,7 +186,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   body: {
-    color: '#e8ecff',
+    color: '#0D1140',
     fontSize: 16,
     lineHeight: 26,
     marginBottom: 24,
