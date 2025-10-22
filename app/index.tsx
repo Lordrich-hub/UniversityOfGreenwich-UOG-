@@ -9,6 +9,12 @@ const GAP_UNDER_UOG_LOGO = 80;
 // Greenwich-LOGO_writng_only.png visual height
 const GREENWICH_TEXT_LOGO_HEIGHT = 104;
 
+// Optional: Debug guide to help align the top of the Greenwich text with a visible red line
+// Set DEBUG_GUIDE to true to show the guide and pause auto-navigation
+const DEBUG_GUIDE = false; // set to true while aligning
+// Position of the red guide line from the top of the screen (in pixels)
+const GUIDE_LINE_TOP = 420;
+
 export default function Index() {
   const router = useRouter();
   
@@ -30,19 +36,24 @@ export default function Index() {
     textTranslateY.value = withDelay(600, withTiming(0, { duration: 900, easing: Easing.out(Easing.quad) }));
     
     // After 9 seconds, fade out both and navigate (total 10s)
-    const fadeOutTimer = setTimeout(() => {
-      logoOpacity.value = withTiming(0, { duration: 800 });
-      logoScale.value = withTiming(0.9, { duration: 800 });
-      textOpacity.value = withTiming(0, { duration: 800 });
-    }, 9000);
-    
-    const navTimer = setTimeout(() => {
-      router.replace('/(tabs)/home');
-    }, 10000);
+    // When DEBUG_GUIDE is true, keep the screen and guide visible
+    const fadeOutTimer = DEBUG_GUIDE
+      ? undefined
+      : setTimeout(() => {
+          logoOpacity.value = withTiming(0, { duration: 800 });
+          logoScale.value = withTiming(0.9, { duration: 800 });
+          textOpacity.value = withTiming(0, { duration: 800 });
+        }, 9000);
+
+    const navTimer = DEBUG_GUIDE
+      ? undefined
+      : setTimeout(() => {
+          router.replace('/(tabs)/home');
+        }, 10000);
     
     return () => {
-      clearTimeout(fadeOutTimer);
-      clearTimeout(navTimer);
+      if (fadeOutTimer) clearTimeout(fadeOutTimer);
+      if (navTimer) clearTimeout(navTimer);
     };
   }, [logoOpacity, logoScale, textOpacity, textTranslateY, router]);
 
@@ -58,11 +69,26 @@ export default function Index() {
 
   return (
     <View style={styles.container}>
+      {DEBUG_GUIDE && (
+        <View
+          pointerEvents="none"
+          style={{ position: 'absolute', top: GUIDE_LINE_TOP, left: 0, right: 0, height: 2, backgroundColor: 'red' }}
+        />
+      )}
       <Animated.View style={[styles.uogLogoWrap, logoAnimStyle]}>
         <Image source={require('../assets/images/uog_logo.png')} style={[styles.uogLogo, { tintColor: '#fff' }]} resizeMode="contain" />
       </Animated.View>
       
-      <Animated.View style={[styles.greenwichLOGOWritngOnlyWrap, textAnimStyle]}>
+      <Animated.View
+        style={[styles.greenwichLOGOWritngOnlyWrap, textAnimStyle]}
+        onLayout={(e) => {
+          if (DEBUG_GUIDE) {
+            const y = e.nativeEvent.layout.y;
+            // eslint-disable-next-line no-console
+            console.log('Greenwich text TOP (y):', y, ' | GUIDE_LINE_TOP:', GUIDE_LINE_TOP, ' | diff:', y - GUIDE_LINE_TOP);
+          }
+        }}
+      >
         <Image
           source={require('../assets/images/Greenwich-LOGO_writng_only.png')}
           style={[styles.greenwichLOGOWritngOnly, { tintColor: '#fff' }]}
