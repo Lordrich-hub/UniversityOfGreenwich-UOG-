@@ -75,20 +75,21 @@ const styles = StyleSheet.create({
     height: 200,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 12,
+    marginBottom: 60,
   },
   logo: {
     width: 180,
     height: 180,
   },
   textLogoWrap: {
-    width: 280,
-    height: 60,
+    width: '85%',
+    height: 80,
     alignItems: 'center',
     justifyContent: 'center',
+    paddingHorizontal: 20,
   },
   textLogo: {
-    width: 260,
-    height: 50,
+    width: '100%',
+    height: 70,
   },
 });
