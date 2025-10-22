@@ -5,7 +5,7 @@ import Animated, { Easing, useAnimatedStyle, useSharedValue, withDelay, withTimi
 
 // Spacing and sizing constants (named after the actual asset files for clarity)
 // uog_logo.png (compass) spacing to Greenwich-LOGO_writng_only.png (text)
-const GAP_UNDER_UOG_LOGO = 80;
+const GAP_UNDER_UOG_LOGO = 48;
 // Greenwich-LOGO_writng_only.png visual height
 const GREENWICH_TEXT_LOGO_HEIGHT = 104;
 
@@ -84,7 +84,7 @@ export default function Index() {
         onLayout={(e) => {
           if (DEBUG_GUIDE) {
             const y = e.nativeEvent.layout.y;
-            // eslint-disable-next-line no-console
+             
             console.log('Greenwich text TOP (y):', y, ' | GUIDE_LINE_TOP:', GUIDE_LINE_TOP, ' | diff:', y - GUIDE_LINE_TOP);
           }
         }}
