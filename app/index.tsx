@@ -15,24 +15,24 @@ export default function Index() {
   const textTranslateY = useSharedValue(30);
 
   useEffect(() => {
-    // Animate main logo: fade in + scale up
-    logoOpacity.value = withTiming(1, { duration: 800, easing: Easing.out(Easing.cubic) });
-    logoScale.value = withTiming(1, { duration: 800, easing: Easing.out(Easing.cubic) });
+    // Animate main logo: fade in + scale up (slower for 10s total)
+    logoOpacity.value = withTiming(1, { duration: 1200, easing: Easing.out(Easing.cubic) });
+    logoScale.value = withTiming(1, { duration: 1200, easing: Easing.out(Easing.cubic) });
     
     // Animate text logo: fade in + slide up (delayed slightly)
-    textOpacity.value = withDelay(400, withTiming(1, { duration: 600, easing: Easing.out(Easing.quad) }));
-    textTranslateY.value = withDelay(400, withTiming(0, { duration: 600, easing: Easing.out(Easing.quad) }));
+    textOpacity.value = withDelay(600, withTiming(1, { duration: 900, easing: Easing.out(Easing.quad) }));
+    textTranslateY.value = withDelay(600, withTiming(0, { duration: 900, easing: Easing.out(Easing.quad) }));
     
-    // After 2.5 seconds, fade out both and navigate
+    // After 9 seconds, fade out both and navigate (total 10s)
     const fadeOutTimer = setTimeout(() => {
-      logoOpacity.value = withTiming(0, { duration: 400 });
-      logoScale.value = withTiming(0.9, { duration: 400 });
-      textOpacity.value = withTiming(0, { duration: 400 });
-    }, 2500);
+      logoOpacity.value = withTiming(0, { duration: 800 });
+      logoScale.value = withTiming(0.9, { duration: 800 });
+      textOpacity.value = withTiming(0, { duration: 800 });
+    }, 9000);
     
     const navTimer = setTimeout(() => {
       router.replace('/(tabs)/home');
-    }, 3000);
+    }, 10000);
     
     return () => {
       clearTimeout(fadeOutTimer);
@@ -53,11 +53,11 @@ export default function Index() {
   return (
     <View style={styles.container}>
       <Animated.View style={[styles.logoWrap, logoAnimStyle]}>
-        <Image source={require('../assets/images/uog_logo.png')} style={styles.logo} resizeMode="contain" />
+        <Image source={require('../assets/images/uog_logo.png')} style={[styles.logo, { tintColor: '#fff' }]} resizeMode="contain" />
       </Animated.View>
       
       <Animated.View style={[styles.textLogoWrap, textAnimStyle]}>
-        <Image source={require('../assets/images/Greenwich-LOGO_writng_only.png')} style={styles.textLogo} resizeMode="contain" />
+        <Image source={require('../assets/images/Greenwich-LOGO_writng_only.png')} style={[styles.textLogo, { tintColor: '#fff' }]} resizeMode="contain" />
       </Animated.View>
     </View>
   );
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
     height: 200,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 30,
+    marginBottom: 12,
   },
   logo: {
     width: 180,
