@@ -57,7 +57,11 @@ export default function Index() {
       </Animated.View>
       
       <Animated.View style={[styles.textLogoWrap, textAnimStyle]}>
-        <Image source={require('../assets/images/Greenwich-LOGO_writng_only.png')} style={[styles.textLogo, { tintColor: '#fff' }]} resizeMode="contain" />
+        <Image
+          source={require('../assets/images/Greenwich-LOGO_writng_only.png')}
+          style={[styles.textLogo, { tintColor: '#fff' }]}
+          resizeMode="stretch"
+        />
       </Animated.View>
     </View>
   );
@@ -71,25 +75,29 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   logoWrap: {
-    width: 200,
-    height: 200,
+    width: 220,
+    height: 220,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 60,
+    // Increase vertical gap to match the red guideline in your screenshot
+    marginBottom: 90,
   },
   logo: {
-    width: 180,
-    height: 180,
+    width: 200,
+    height: 200,
   },
   textLogoWrap: {
-    width: '85%',
-    height: 80,
+    // Stretch close to full width while keeping subtle side margins
+    width: '92%',
+    height: 92,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: 8,
   },
   textLogo: {
     width: '100%',
-    height: 70,
+    height: 92,
+    // Slight horizontal stretch to overcome transparent padding inside the PNG
+    transform: [{ scaleX: 1.03 }],
   },
 });
