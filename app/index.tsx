@@ -60,7 +60,7 @@ export default function Index() {
         <Image
           source={require('../assets/images/Greenwich-LOGO_writng_only.png')}
           style={[styles.textLogo, { tintColor: '#fff' }]}
-          resizeMode="stretch"
+          resizeMode="contain"
         />
       </Animated.View>
     </View>
@@ -79,25 +79,23 @@ const styles = StyleSheet.create({
     height: 220,
     alignItems: 'center',
     justifyContent: 'center',
-    // Increase vertical gap to match the red guideline in your screenshot
-    marginBottom: 90,
+    // Balanced gap under the compass
+    marginBottom: 80,
   },
   logo: {
     width: 200,
     height: 200,
   },
   textLogoWrap: {
-    // Stretch close to full width while keeping subtle side margins
-    width: '92%',
-    height: 92,
+    // Normal aspect ratio with generous width but not edge-to-edge
+    width: '85%',
+    height: 104,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 8,
+    paddingHorizontal: 0,
   },
   textLogo: {
     width: '100%',
-    height: 92,
-    // Slight horizontal stretch to overcome transparent padding inside the PNG
-    transform: [{ scaleX: 1.03 }],
+    height: 104,
   },
 });
