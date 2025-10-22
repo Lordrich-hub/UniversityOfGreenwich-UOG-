@@ -3,9 +3,11 @@ import React, { useEffect } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withDelay, withTiming } from 'react-native-reanimated';
 
-// Adjust these constants to change visual spacing and size easily
-const GAP_UNDER_COMPASS = 80; // distance between compass (top logo) and the text logo
-const TEXT_LOGO_HEIGHT = 104; // height of the Greenwich text logo
+// Spacing and sizing constants (named after the actual asset files for clarity)
+// uog_logo.png (compass) spacing to Greenwich-LOGO_writng_only.png (text)
+const GAP_UNDER_UOG_LOGO = 80;
+// Greenwich-LOGO_writng_only.png visual height
+const GREENWICH_TEXT_LOGO_HEIGHT = 104;
 
 export default function Index() {
   const router = useRouter();
@@ -56,14 +58,14 @@ export default function Index() {
 
   return (
     <View style={styles.container}>
-      <Animated.View style={[styles.logoWrap, logoAnimStyle]}>
-        <Image source={require('../assets/images/uog_logo.png')} style={[styles.logo, { tintColor: '#fff' }]} resizeMode="contain" />
+      <Animated.View style={[styles.uogLogoWrap, logoAnimStyle]}>
+        <Image source={require('../assets/images/uog_logo.png')} style={[styles.uogLogo, { tintColor: '#fff' }]} resizeMode="contain" />
       </Animated.View>
       
-      <Animated.View style={[styles.textLogoWrap, textAnimStyle]}>
+      <Animated.View style={[styles.greenwichLOGOWritngOnlyWrap, textAnimStyle]}>
         <Image
           source={require('../assets/images/Greenwich-LOGO_writng_only.png')}
-          style={[styles.textLogo, { tintColor: '#fff' }]}
+          style={[styles.greenwichLOGOWritngOnly, { tintColor: '#fff' }]}
           resizeMode="contain"
         />
       </Animated.View>
@@ -78,28 +80,32 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  logoWrap: {
+  // Wrap for uog_logo.png (compass)
+  uogLogoWrap: {
     width: 220,
     height: 220,
     alignItems: 'center',
     justifyContent: 'center',
-    // Balanced gap under the compass (edit GAP_UNDER_COMPASS above)
-    marginBottom: GAP_UNDER_COMPASS,
+    // Edit GAP_UNDER_UOG_LOGO above to change the space to the text logo
+    marginBottom: GAP_UNDER_UOG_LOGO,
   },
-  logo: {
+  // Image style for uog_logo.png
+  uogLogo: {
     width: 200,
     height: 200,
   },
-  textLogoWrap: {
+  // Wrap for Greenwich-LOGO_writng_only.png (text)
+  greenwichLOGOWritngOnlyWrap: {
     // Normal aspect ratio with generous width but not edge-to-edge
     width: '85%',
-    height: TEXT_LOGO_HEIGHT,
+    height: GREENWICH_TEXT_LOGO_HEIGHT,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 0,
   },
-  textLogo: {
+  // Image style for Greenwich-LOGO_writng_only.png
+  greenwichLOGOWritngOnly: {
     width: '100%',
-    height: TEXT_LOGO_HEIGHT,
+    height: GREENWICH_TEXT_LOGO_HEIGHT,
   },
 });
