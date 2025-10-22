@@ -1,5 +1,4 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -29,12 +28,10 @@ export default function Home() {
   // The logo is translated down by extraOffset/2; shift buttons by same amount so they align
   const buttonTop = Math.round((headerHeight - buttonSize) / 2 + extraOffset / 2);
 
-  // Overlay tuning (lighter and more even)
-  const HERO_BLUR_INTENSITY = 14; // lighter blur
-  const HERO_OVERLAY_HEIGHT = 124; // slightly shorter overlay
-  // Gradient that softly fades in from top to bottom (lighter than before)
-  const HERO_GRADIENT_COLORS = ['rgba(13,17,64,0)', 'rgba(13,17,64,0.18)', 'rgba(13,17,64,0.35)'];
-  const HERO_GRADIENT_LOCATIONS = [0, 0.5, 1];
+  // Overlay tuning (no blur, clean brand gradient fade)
+  const HERO_OVERLAY_HEIGHT = 168; // taller fade for readability
+  const HERO_GRADIENT_COLORS = ['rgba(13,17,64,0)', 'rgba(13,17,64,0.45)', 'rgba(13,17,64,0.92)'];
+  const HERO_GRADIENT_LOCATIONS = [0, 0.55, 1];
 
   const HERO_SLIDES = useMemo(() => ([
     {
@@ -154,9 +151,8 @@ export default function Home() {
           renderItem={({ item }) => (
             <View style={[styles.heroSlide, { width: winW, height: heroHeight }]}>
               <ImageBackground source={item.image} style={StyleSheet.absoluteFill} resizeMode="cover" />
-              {/* Bottom overlay with blur */}
+              {/* Bottom overlay with gradient (no blur) */}
               <View style={styles.heroOverlayWrap}>
-                <BlurView intensity={HERO_BLUR_INTENSITY} tint="dark" style={[styles.heroBlur, { height: HERO_OVERLAY_HEIGHT }]} />
                 <LinearGradient
                   colors={HERO_GRADIENT_COLORS}
                   locations={HERO_GRADIENT_LOCATIONS}
@@ -256,14 +252,13 @@ const styles = StyleSheet.create({
   hero: { width: '100%' },
   heroSlide: { width: '100%', overflow: 'hidden' },
   heroOverlayWrap: { position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: 16, paddingBottom: 16 },
-  heroBlur: { ...StyleSheet.absoluteFillObject, borderTopLeftRadius: 16, borderTopRightRadius: 16 },
   heroGradient: { ...StyleSheet.absoluteFillObject, borderTopLeftRadius: 16, borderTopRightRadius: 16 },
   heroTextArea: { padding: 16 },
   dotsWrap: { position: 'absolute', left: 0, right: 0, alignItems: 'center', flexDirection: 'row', justifyContent: 'center', gap: 6 },
   dot: { width: 7, height: 7, borderRadius: 3.5, backgroundColor: 'rgba(255,255,255,0.35)', marginHorizontal: 4 },
   dotActive: { backgroundColor: '#fff', width: 8, height: 8, borderRadius: 4 },
   heroBadge: { color: '#fff', backgroundColor: 'rgba(255,255,255,0.08)', alignSelf: 'flex-start', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 16, marginBottom: 10 },
-  heroTitle: { color: '#fff', fontSize: 20, fontWeight: '800', marginBottom: 6 },
+  heroTitle: { color: '#fff', fontSize: 26, lineHeight: 30, fontWeight: '800', marginBottom: 6 },
   heroMeta: { color: '#c8cfee' },
   container: { padding: 16 },
   cardLarge: { backgroundColor: '#0f1538', borderRadius: 14, padding: 18, marginBottom: 12 },
