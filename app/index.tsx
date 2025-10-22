@@ -3,6 +3,10 @@ import React, { useEffect } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withDelay, withTiming } from 'react-native-reanimated';
 
+// Adjust these constants to change visual spacing and size easily
+const GAP_UNDER_COMPASS = 80; // distance between compass (top logo) and the text logo
+const TEXT_LOGO_HEIGHT = 104; // height of the Greenwich text logo
+
 export default function Index() {
   const router = useRouter();
   
@@ -79,8 +83,8 @@ const styles = StyleSheet.create({
     height: 220,
     alignItems: 'center',
     justifyContent: 'center',
-    // Balanced gap under the compass
-    marginBottom: 80,
+    // Balanced gap under the compass (edit GAP_UNDER_COMPASS above)
+    marginBottom: GAP_UNDER_COMPASS,
   },
   logo: {
     width: 200,
@@ -89,13 +93,13 @@ const styles = StyleSheet.create({
   textLogoWrap: {
     // Normal aspect ratio with generous width but not edge-to-edge
     width: '85%',
-    height: 104,
+    height: TEXT_LOGO_HEIGHT,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 0,
   },
   textLogo: {
     width: '100%',
-    height: 104,
+    height: TEXT_LOGO_HEIGHT,
   },
 });
