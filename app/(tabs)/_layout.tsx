@@ -26,6 +26,8 @@ export default function TabsLayout() {
         tabBarIconStyle: { marginBottom: -4 },
         tabBarHideOnKeyboard: true,
       }}>
+      {/* Hide the default index screen from the tab bar and routing */}
+      <Tabs.Screen name="index" options={{ href: null }} />
       <Tabs.Screen name="home" options={{ title: 'Home', tabBarIcon: ({ color }) => <MaterialIcons name="home" size={22} color={color} /> }} />
       <Tabs.Screen name="timetable" options={{ title: 'Timetable', tabBarIcon: ({ color }) => <MaterialIcons name="event" size={22} color={color} /> }} />
       <Tabs.Screen name="modules" options={{ title: 'Modules', tabBarIcon: ({ color }) => <MaterialCommunityIcons name="book-open-variant" size={22} color={color} /> }} />

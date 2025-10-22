@@ -1,7 +1,8 @@
 import { MaterialIcons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
 import { useRouter } from 'expo-router';
-import React from 'react';
-import { Image, ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { FlatList, Image, ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 
@@ -26,6 +27,54 @@ export default function Home() {
   const buttonSize = 44;
   // The logo is translated down by extraOffset/2; shift buttons by same amount so they align
   const buttonTop = Math.round((headerHeight - buttonSize) / 2 + extraOffset / 2);
+
+  const HERO_SLIDES = useMemo(() => ([
+    {
+      id: 'hero-1',
+      image: require('../../assets/images/UOG.png'),
+      category: 'University News',
+      title: 'Campus Updates: New Library Opening & Term Timetable',
+      meta: 'Announcements · 2 hours ago',
+      newsId: 'news-hero-1',
+    },
+    {
+      id: 'hero-2',
+      image: require('../../assets/images/dreadnought.png'),
+      category: 'University News',
+      title: 'Dreadnought building now open late',
+      meta: 'Facilities · 1 hour ago',
+      newsId: 'news-hero-2',
+    },
+    {
+      id: 'hero-3',
+      image: require('../../assets/images/library.png'),
+      category: 'Library',
+      title: 'Library extended hours this weekend',
+      meta: 'Announcements · 3 hours ago',
+      newsId: 'news-hero-3',
+    },
+    {
+      id: 'hero-4',
+      image: require('../../assets/images/librarybuilding.png'),
+      category: 'Campus',
+      title: 'New study spaces in library building',
+      meta: 'Campus · today',
+      newsId: 'news-hero-4',
+    },
+  ]), []);
+
+  const [activeIndex, setActiveIndex] = useState(0);
+  const heroRef = useRef<FlatList<any>>(null);
+
+  // Auto-advance the hero every 10 seconds
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const next = (activeIndex + 1) % HERO_SLIDES.length;
+      setActiveIndex(next);
+      heroRef.current?.scrollToIndex({ index: next, animated: true });
+    }, 10000);
+    return () => clearInterval(timer);
+  }, [activeIndex, HERO_SLIDES.length]);
 
   const FEEDS = [
     { id: 'news-1', title: 'New library wing opens on Monday', meta: 'Announcements · 2 hours ago' },
@@ -60,14 +109,39 @@ export default function Home() {
       </View>
 
       <ScrollView style={styles.contentScroll} contentContainerStyle={{ paddingBottom: insets.bottom + 30 }}>
-        <ImageBackground source={require('../../assets/images/UOG.png')} style={[styles.hero, { height: heroHeight }]} resizeMode="cover" />
+        {/* Hero carousel */}
+        <FlatList
+          ref={heroRef}
+          data={HERO_SLIDES}
+          keyExtractor={(item) => item.id}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          onMomentumScrollEnd={(e) => {
+            const idx = Math.round(e.nativeEvent.contentOffset.x / winW);
+            setActiveIndex(idx);
+          }}
+          renderItem={({ item }) => (
+            <View style={[styles.heroSlide, { width: winW, height: heroHeight }]}>
+              <ImageBackground source={item.image} style={StyleSheet.absoluteFill} resizeMode="cover" />
+              {/* Bottom overlay with blur */}
+              <View style={styles.heroOverlayWrap}>
+                <BlurView intensity={40} tint="dark" style={styles.heroBlur} />
+                <TouchableOpacity
+                  activeOpacity={0.9}
+                  style={styles.heroTextArea}
+                  onPress={() => router.push({ pathname: '/news/[id]', params: { id: item.newsId } })}
+                >
+                  <Text style={styles.heroBadge}> {item.category} </Text>
+                  <Text style={styles.heroTitle}>{item.title}</Text>
+                  <Text style={styles.heroMeta}>{item.meta}</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+        />
 
         <View style={styles.container}>
-        <View style={styles.heroTextWrap}>
-          <Text style={styles.heroBadge}>University News</Text>
-          <Text style={styles.heroTitle}>Campus Updates: New Library Opening & Term Timetable</Text>
-          <Text style={styles.heroMeta}>{'Announcements · 2 hours ago'}</Text>
-        </View>
 
         <View style={styles.cardLarge}>
           <Text style={styles.cardTitle}>Latest</Text>
@@ -126,7 +200,10 @@ const styles = StyleSheet.create({
   avatar: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#3b4a9e', alignItems: 'center', justifyContent: 'center' },
   avatarText: { color: '#fff', fontWeight: '700' },
   hero: { width: '100%' },
-  heroTextWrap: { padding: 16 },
+  heroSlide: { width: '100%', overflow: 'hidden' },
+  heroOverlayWrap: { position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: 16, paddingBottom: 16 },
+  heroBlur: { ...StyleSheet.absoluteFillObject, borderTopLeftRadius: 16, borderTopRightRadius: 16, height: 132 },
+  heroTextArea: { padding: 16 },
   heroBadge: { color: '#fff', backgroundColor: 'rgba(255,255,255,0.08)', alignSelf: 'flex-start', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 16, marginBottom: 10 },
   heroTitle: { color: '#fff', fontSize: 20, fontWeight: '800', marginBottom: 6 },
   heroMeta: { color: '#c8cfee' },
