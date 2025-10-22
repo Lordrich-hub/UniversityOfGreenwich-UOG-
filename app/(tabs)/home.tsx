@@ -29,12 +29,12 @@ export default function Home() {
   // The logo is translated down by extraOffset/2; shift buttons by same amount so they align
   const buttonTop = Math.round((headerHeight - buttonSize) / 2 + extraOffset / 2);
 
-  // Overlay tuning
-  const HERO_BLUR_INTENSITY = 26; // lower blur strength
-  const HERO_OVERLAY_HEIGHT = 132; // overlay height at bottom
-  // Gradient that fades in from transparent (top) to darker (bottom)
-  const HERO_GRADIENT_COLORS = ['rgba(13,17,64,0)', 'rgba(13,17,64,0.35)', 'rgba(13,17,64,0.7)'];
-  const HERO_GRADIENT_LOCATIONS = [0, 0.55, 1];
+  // Overlay tuning (lighter and more even)
+  const HERO_BLUR_INTENSITY = 14; // lighter blur
+  const HERO_OVERLAY_HEIGHT = 124; // slightly shorter overlay
+  // Gradient that softly fades in from top to bottom (lighter than before)
+  const HERO_GRADIENT_COLORS = ['rgba(13,17,64,0)', 'rgba(13,17,64,0.18)', 'rgba(13,17,64,0.35)'];
+  const HERO_GRADIENT_LOCATIONS = [0, 0.5, 1];
 
   const HERO_SLIDES = useMemo(() => ([
     {
@@ -73,16 +73,23 @@ export default function Home() {
 
   const [activeIndex, setActiveIndex] = useState(0);
   const heroRef = useRef<FlatList<any>>(null);
+  const SLIDE_COUNT = HERO_SLIDES.length;
+  const LOOP_FACTOR = 400; // large enough to simulate infinite list
+  const VIRTUAL_COUNT = SLIDE_COUNT * LOOP_FACTOR;
+  const VIRTUAL_START_INDEX = Math.floor(VIRTUAL_COUNT / 2);
+  const currentIndexRef = useRef(VIRTUAL_START_INDEX);
 
   // Auto-advance the hero every 10 seconds
   useEffect(() => {
     const timer = setInterval(() => {
-      const next = (activeIndex + 1) % HERO_SLIDES.length;
-      setActiveIndex(next);
+      const next = currentIndexRef.current + 1;
+      currentIndexRef.current = next;
+      // Update active index modulo the number of real slides
+      setActiveIndex(next % SLIDE_COUNT);
       heroRef.current?.scrollToIndex({ index: next, animated: true });
     }, 10000);
     return () => clearInterval(timer);
-  }, [activeIndex, HERO_SLIDES.length]);
+  }, [SLIDE_COUNT]);
 
   const FEEDS = [
     { id: 'news-1', title: 'New library wing opens on Monday', meta: 'Announcements · 2 hours ago' },
@@ -120,14 +127,29 @@ export default function Home() {
         {/* Hero carousel */}
         <FlatList
           ref={heroRef}
-          data={HERO_SLIDES}
-          keyExtractor={(item) => item.id}
+          data={Array.from({ length: VIRTUAL_COUNT }, (_, i) => ({
+            ...HERO_SLIDES[i % SLIDE_COUNT],
+            _vkey: `${i}-${HERO_SLIDES[i % SLIDE_COUNT].id}`,
+          }))}
+          keyExtractor={(item) => item._vkey}
           horizontal
           pagingEnabled
           showsHorizontalScrollIndicator={false}
+          initialScrollIndex={VIRTUAL_START_INDEX}
+          getItemLayout={(_, index) => ({ length: winW, offset: winW * index, index })}
           onMomentumScrollEnd={(e) => {
             const idx = Math.round(e.nativeEvent.contentOffset.x / winW);
-            setActiveIndex(idx);
+            currentIndexRef.current = idx;
+            setActiveIndex(idx % SLIDE_COUNT);
+            // Soft wrap-around: if too close to edges, jump back to middle quietly
+            const EDGE_BUFFER = SLIDE_COUNT * 2;
+            if (idx < EDGE_BUFFER || idx > VIRTUAL_COUNT - EDGE_BUFFER) {
+              const newIndex = VIRTUAL_START_INDEX + (idx % SLIDE_COUNT);
+              currentIndexRef.current = newIndex;
+              requestAnimationFrame(() => {
+                heroRef.current?.scrollToIndex({ index: newIndex, animated: false });
+              });
+            }
           }}
           renderItem={({ item }) => (
             <View style={[styles.heroSlide, { width: winW, height: heroHeight }]}>
@@ -154,6 +176,24 @@ export default function Home() {
             </View>
           )}
         />
+
+        {/* Carousel dots */}
+        <View style={[styles.dotsWrap, { width: winW, bottom: 16 }]}>
+          {HERO_SLIDES.map((_, i) => (
+            <TouchableOpacity
+              key={`dot-${i}`}
+              onPress={() => {
+                const target = VIRTUAL_START_INDEX + i;
+                currentIndexRef.current = target;
+                setActiveIndex(i);
+                heroRef.current?.scrollToIndex({ index: target, animated: true });
+              }}
+              style={[styles.dot, i === activeIndex && styles.dotActive]}
+              accessibilityRole="button"
+              accessibilityLabel={`Go to slide ${i + 1}`}
+            />
+          ))}
+        </View>
 
         <View style={styles.container}>
 
@@ -219,6 +259,9 @@ const styles = StyleSheet.create({
   heroBlur: { ...StyleSheet.absoluteFillObject, borderTopLeftRadius: 16, borderTopRightRadius: 16 },
   heroGradient: { ...StyleSheet.absoluteFillObject, borderTopLeftRadius: 16, borderTopRightRadius: 16 },
   heroTextArea: { padding: 16 },
+  dotsWrap: { position: 'absolute', left: 0, right: 0, alignItems: 'center', flexDirection: 'row', justifyContent: 'center', gap: 6 },
+  dot: { width: 7, height: 7, borderRadius: 3.5, backgroundColor: 'rgba(255,255,255,0.35)', marginHorizontal: 4 },
+  dotActive: { backgroundColor: '#fff', width: 8, height: 8, borderRadius: 4 },
   heroBadge: { color: '#fff', backgroundColor: 'rgba(255,255,255,0.08)', alignSelf: 'flex-start', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 16, marginBottom: 10 },
   heroTitle: { color: '#fff', fontSize: 20, fontWeight: '800', marginBottom: 6 },
   heroMeta: { color: '#c8cfee' },
