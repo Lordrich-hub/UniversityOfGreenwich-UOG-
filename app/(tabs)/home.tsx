@@ -88,11 +88,39 @@ export default function Home() {
     return () => clearInterval(timer);
   }, [SLIDE_COUNT]);
 
-  const FEEDS = [
-    { id: 'news-1', title: 'New library wing opens on Monday', meta: 'Announcements · 2 hours ago' },
-    { id: 'news-2', title: 'Freshers fair this Friday', meta: 'Events · 1 day ago' },
-    { id: 'news-3', title: 'Term timetables published', meta: 'Academic · 3 days ago' },
-    { id: 'news-4', title: 'Scholarships deadline: 30th Oct', meta: 'Funding · 5 days ago' },
+  const FEED_ITEMS = [
+    { 
+      id: 'news-1', 
+      title: 'Campus Life at Greenwich', 
+      subtitle: 'Explore the vibrant student community',
+      image: require('../../assets/images/greenwich-01.png'),
+      category: 'Featured',
+      type: 'large'
+    },
+    { 
+      id: 'news-2', 
+      title: 'Graduation Ceremony 2025', 
+      subtitle: 'Celebrating our graduating class',
+      image: require('../../assets/images/graduation.png'),
+      category: 'Events',
+      type: 'small'
+    },
+    { 
+      id: 'news-3', 
+      title: 'University of Greenwich Pembroke Building', 
+      subtitle: 'State-of-the-art facilities',
+      image: require('../../assets/images/University-Greenwich-Pembroke.jpg'),
+      category: 'Campus',
+      type: 'small'
+    },
+    { 
+      id: 'news-4', 
+      title: 'Academic Excellence', 
+      subtitle: 'Supporting your learning journey',
+      image: require('../../assets/images/OIP.png'),
+      category: 'Academic',
+      type: 'small'
+    },
   ];
   return (
     <View style={styles.page}>
@@ -191,41 +219,43 @@ export default function Home() {
           ))}
         </View>
 
-        <View style={styles.container}>
-
-        <View style={styles.cardLarge}>
-          <Text style={styles.cardTitle}>Latest</Text>
-          <Text style={styles.cardSub}>Select an item below to read more.</Text>
-        </View>
-
-          {FEEDS.map((item) => (
-            <TouchableOpacity
-              key={item.id}
-              style={styles.cardRowItem}
-              onPress={() => router.push({ pathname: '/news/[id]', params: { id: item.id } })}
-            >
-              <Image source={require('../../assets/images/uog_logo.png')} style={styles.thumb} />
-              <View style={{ flex: 1 }}>
-                <Text style={styles.cardTitle}>{item.title}</Text>
-                <Text style={styles.cardSub}>{item.meta}</Text>
-              </View>
+        {/* Latest section - white background */}
+        <View style={styles.latestSection}>
+          <View style={styles.latestHeader}>
+            <Text style={styles.latestTitle}>Latest</Text>
+            <TouchableOpacity onPress={() => alert('See all')}>
+              <Text style={styles.seeAllText}>See all  ›</Text>
             </TouchableOpacity>
+          </View>
+
+          {FEED_ITEMS.map((item) => (
+            item.type === 'large' ? (
+              <TouchableOpacity
+                key={item.id}
+                style={styles.featuredCard}
+                onPress={() => router.push({ pathname: '/news/[id]', params: { id: item.id } })}
+              >
+                <Image source={item.image} style={styles.featuredImage} resizeMode="cover" />
+                <View style={styles.featuredContent}>
+                  <Text style={styles.featuredTitle}>{item.title}</Text>
+                  <Text style={styles.featuredCategory}>{item.category}</Text>
+                </View>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                key={item.id}
+                style={styles.smallCard}
+                onPress={() => router.push({ pathname: '/news/[id]', params: { id: item.id } })}
+              >
+                <Image source={item.image} style={styles.smallImage} resizeMode="cover" />
+                <View style={styles.smallContent}>
+                  <Text style={styles.smallTitle}>{item.title}</Text>
+                  <Text style={styles.smallSubtitle}>{item.subtitle}</Text>
+                  <Text style={styles.smallCategory}>{item.category}</Text>
+                </View>
+              </TouchableOpacity>
+            )
           ))}
-
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>Student Life</Text>
-            <Text style={styles.cardSub}>Coffee morning in the Student Hub · Society sign-ups open</Text>
-          </View>
-
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>Academic</Text>
-            <Text style={styles.cardSub}>Office hours updated for Mathematics department · New lecture notes uploaded</Text>
-          </View>
-
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>Support</Text>
-            <Text style={styles.cardSub}>Counselling appointments available — book via student portal</Text>
-          </View>
         </View>
       </ScrollView>
     </View>
@@ -260,11 +290,22 @@ const styles = StyleSheet.create({
   heroBadge: { color: '#fff', backgroundColor: 'rgba(255,255,255,0.18)', alignSelf: 'flex-start', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 16, marginBottom: 10, borderWidth: 1, borderColor: 'rgba(200,207,238,0.2)' },
   heroTitle: { color: '#fff', fontSize: 26, lineHeight: 30, fontWeight: '800', marginBottom: 6 },
   heroMeta: { color: '#c8cfee' },
-  container: { padding: 16 },
-  cardLarge: { backgroundColor: '#0f1538', borderRadius: 14, padding: 18, marginBottom: 12 },
-  card: { backgroundColor: '#0f1538', borderRadius: 14, padding: 14, marginBottom: 12 },
-  cardRowItem: { backgroundColor: '#0f1538', borderRadius: 12, padding: 12, marginBottom: 12, flexDirection: 'row', alignItems: 'center' },
-  thumb: { width: 66, height: 66, borderRadius: 8, marginRight: 12 },
-  cardTitle: { color: '#fff', fontWeight: '800', fontSize: 16, marginBottom: 6 },
-  cardSub: { color: '#c8cfee' },
+  // Latest section - white background with dark blue text
+  latestSection: { backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, marginTop: -20, paddingTop: 24, paddingHorizontal: 16, paddingBottom: 24 },
+  latestHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
+  latestTitle: { fontSize: 28, fontWeight: '800', color: '#0D1140' },
+  seeAllText: { fontSize: 16, fontWeight: '600', color: '#0D1140' },
+  // Featured large card
+  featuredCard: { backgroundColor: '#f8f9fb', borderRadius: 16, marginBottom: 16, overflow: 'hidden' },
+  featuredImage: { width: '100%', height: 220 },
+  featuredContent: { padding: 16 },
+  featuredTitle: { fontSize: 22, fontWeight: '800', color: '#0D1140', marginBottom: 8 },
+  featuredCategory: { fontSize: 14, color: '#6b7280', fontWeight: '500' },
+  // Small cards with image on right
+  smallCard: { backgroundColor: '#f8f9fb', borderRadius: 12, marginBottom: 12, flexDirection: 'row', overflow: 'hidden', padding: 12 },
+  smallImage: { width: 120, height: 100, borderRadius: 8 },
+  smallContent: { flex: 1, paddingRight: 12, justifyContent: 'center' },
+  smallTitle: { fontSize: 16, fontWeight: '700', color: '#0D1140', marginBottom: 4 },
+  smallSubtitle: { fontSize: 13, color: '#6b7280', marginBottom: 6 },
+  smallCategory: { fontSize: 12, color: '#0D1140', fontWeight: '600', opacity: 0.6 },
 });
