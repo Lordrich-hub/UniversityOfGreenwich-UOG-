@@ -31,8 +31,8 @@ export default function Home() {
 
   // Overlay tuning (no blur, clean brand gradient fade)
   const HERO_OVERLAY_HEIGHT = 168; // taller fade for readability
-  const HERO_GRADIENT_COLORS = ['rgba(13,17,64,0)', 'rgba(13,17,64,0.45)', 'rgba(13,17,64,0.92)'];
-  const HERO_GRADIENT_LOCATIONS = [0, 0.55, 1];
+  const HERO_GRADIENT_COLORS = ['rgba(13,17,64,0)', 'rgba(13,17,64,0.45)', 'rgba(13,17,64,0.92)'] as const;
+  const HERO_GRADIENT_LOCATIONS = [0, 0.55, 1] as const;
 
   const HERO_SLIDES = useMemo(() => ([
     {
@@ -128,7 +128,7 @@ export default function Home() {
       {/* Header with side buttons at edges and absolutely centered logo */}
   <View style={[styles.header, { paddingTop: (insets.top || 8) + extraOffset, height: (insets.top || 0) + 56 + extraOffset }]}> 
         {/* left edge button - absolutely positioned so center stays exact */}
-  <TouchableOpacity style={[styles.edgeLeft, { top: buttonTop, height: buttonSize, justifyContent: 'center' }]} onPress={() => router.push('/scan')}> 
+  <TouchableOpacity style={[styles.edgeLeft, { top: buttonTop, height: buttonSize, justifyContent: 'center' }]} onPress={() => router.push('/(tabs)/scan')}> 
           <MaterialIcons name="qr-code-scanner" size={28} color="#fff" />
         </TouchableOpacity>
 

@@ -10,28 +10,66 @@ export default function TabsLayout() {
         tabBarStyle: {
           backgroundColor: '#0D1140',
           borderTopColor: 'transparent',
-          height: 66,
-          paddingBottom: 8,
-          paddingTop: 6,
-          borderTopLeftRadius: 12,
-          borderTopRightRadius: 12,
+          height: 72,
+          marginHorizontal: 16,
+          marginBottom: 18,
+          borderRadius: 24,
           position: 'absolute',
-          left: 8,
-          right: 8,
-          bottom: 10,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.18,
+          shadowRadius: 12,
+          elevation: 12,
         },
         tabBarActiveTintColor: '#fff',
         tabBarInactiveTintColor: '#9aa0c7',
-        tabBarLabelStyle: { fontSize: 12, marginBottom: 4 },
-        tabBarIconStyle: { marginBottom: -4 },
+        tabBarLabelStyle: { fontSize: 13, marginBottom: 2, fontWeight: '600' },
+        tabBarIconStyle: { marginBottom: -2 },
+        tabBarItemStyle: { marginHorizontal: 8, borderRadius: 16 },
         tabBarHideOnKeyboard: true,
+        tabBarIndicatorStyle: {
+          height: 4,
+          borderRadius: 2,
+          backgroundColor: '#3A7BFF',
+          position: 'absolute',
+          bottom: 8,
+        },
       }}>
       {/* Hide the default index screen from the tab bar and routing */}
       <Tabs.Screen name="index" options={{ href: null }} />
-      <Tabs.Screen name="home" options={{ title: 'Home', tabBarIcon: ({ color }) => <MaterialIcons name="home" size={22} color={color} /> }} />
-      <Tabs.Screen name="timetable" options={{ title: 'Timetable', tabBarIcon: ({ color }) => <MaterialIcons name="event" size={22} color={color} /> }} />
-      <Tabs.Screen name="modules" options={{ title: 'Modules', tabBarIcon: ({ color }) => <MaterialCommunityIcons name="book-open-variant" size={22} color={color} /> }} />
-      <Tabs.Screen name="explore" options={{ title: 'Explore', tabBarIcon: ({ color }) => <MaterialIcons name="explore" size={22} color={color} /> }} />
-     </Tabs>
+      <Tabs.Screen name="home" options={{
+        title: 'Home',
+        tabBarIcon: ({ color, focused }) => (
+          <MaterialIcons name="home" size={focused ? 30 : 24} color={color} />
+        ),
+      }} />
+      <Tabs.Screen name="timetable" options={{
+        title: 'Timetable',
+        tabBarIcon: ({ color, focused }) => (
+          <MaterialIcons name="event" size={focused ? 30 : 24} color={color} />
+        ),
+      }} />
+      <Tabs.Screen name="modules" options={{
+        title: 'Modules',
+        tabBarIcon: ({ color, focused }) => (
+          <MaterialCommunityIcons name="book-open-variant" size={focused ? 30 : 24} color={color} />
+        ),
+      }} />
+      <Tabs.Screen name="explore" options={{
+        title: 'Explore',
+        tabBarIcon: ({ color, focused }) => (
+          <MaterialIcons name="explore" size={focused ? 30 : 24} color={color} />
+        ),
+      }} />
+      <Tabs.Screen name="scan" options={{
+        title: 'Scan',
+        tabBarIcon: ({ color, focused }) => (
+          <MaterialIcons name="qr-code-scanner" size={focused ? 30 : 24} color={color} />
+        ),
+      }} />
+    </Tabs>
   );
 }
