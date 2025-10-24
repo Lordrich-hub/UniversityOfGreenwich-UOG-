@@ -1,13 +1,17 @@
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import React from 'react';
+import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function Health() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+
+  const [showBookingModal, setShowBookingModal] = useState(false);
+  const [showPrescriptionsModal, setShowPrescriptionsModal] = useState(false);
+  const [selectedAppointmentType, setSelectedAppointmentType] = useState('');
 
   const upcomingAppointments = [
     { 
@@ -60,6 +64,63 @@ export default function Health() {
     },
   ];
 
+  const handleServiceClick = (label: string) => {
+    switch (label) {
+      case 'Book Appointment':
+        setShowBookingModal(true);
+        break;
+      case 'Prescriptions':
+        setShowPrescriptionsModal(true);
+        break;
+      case 'Mental Health':
+        Alert.alert(
+          'Mental Health Support',
+          '🧠 Student Counseling Services\n\n📞 24/7 Crisis Line: 0800-123-4567\n📧 counseling@gre.ac.uk\n\n💬 Free confidential counseling\n🕐 Walk-in hours: Mon-Fri 9am-5pm\n\nYou are not alone. We are here to help.',
+          [{ text: 'OK' }]
+        );
+        break;
+      case 'Immunizations':
+        Alert.alert(
+          'Immunization Records',
+          'Your Immunization Status:\n\n✅ COVID-19: Up to date\n✅ Flu: Current season\n✅ MMR: Complete\n✅ Tetanus: Valid until 2027\n\nNext recommended: Annual Flu (Oct 2025)',
+          [{ text: 'OK' }]
+        );
+        break;
+      case 'Emergency Info':
+        Alert.alert(
+          '🚨 Emergency Contact',
+          'Emergency Services: 999\n\nStudent Health Center:\n📞 +44 20 8331 9000\n📍 Main Campus Building\n\nCampus Security:\n📞 +44 20 8331 8888\n\nNearest Hospital:\nQueen Elizabeth Hospital\n📍 Stadium Road, SE18 4QH',
+          [{ text: 'OK' }]
+        );
+        break;
+      case 'Wellness Tips':
+        Alert.alert(
+          '💪 Wellness Tips',
+          '• Get 7-9 hours of sleep\n• Drink 8 glasses of water daily\n• Exercise 30 min/day\n• Take study breaks every hour\n• Practice mindfulness\n• Eat balanced meals\n• Stay socially connected\n• Limit screen time before bed\n\nYour health is your wealth! 🌟',
+          [{ text: 'Got it!' }]
+        );
+        break;
+    }
+  };
+
+  const handleBookAppointment = (type: string) => {
+    setSelectedAppointmentType(type);
+    Alert.alert(
+      'Confirm Booking',
+      `Book ${type} appointment?\n\nNext available: Jan 20, 2025 at 10:00 AM`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Book',
+          onPress: () => {
+            setShowBookingModal(false);
+            Alert.alert('Success', `${type} appointment booked for Jan 20 at 10:00 AM!`);
+          },
+        },
+      ]
+    );
+  };
+
   return (
     <View style={styles.page}>
       {/* Header */}
@@ -87,7 +148,7 @@ export default function Health() {
               <Text style={styles.bookTitle}>Need to see a doctor?</Text>
               <Text style={styles.bookSubtitle}>Book an appointment in seconds</Text>
             </View>
-            <TouchableOpacity style={styles.bookButton} onPress={() => alert('Booking system coming soon')}>
+            <TouchableOpacity style={styles.bookButton} onPress={() => setShowBookingModal(true)}>
               <Text style={styles.bookButtonText}>Book Now</Text>
               <MaterialIcons name="arrow-forward" size={18} color="#3b82f6" />
             </TouchableOpacity>
@@ -134,7 +195,7 @@ export default function Health() {
               <TouchableOpacity
                 key={index}
                 style={styles.serviceCard}
-                onPress={() => alert(`${service.label} coming soon`)}
+                onPress={() => handleServiceClick(service.label)}
               >
                 <View style={[styles.serviceIcon, { backgroundColor: service.color + '15' }]}>
                   <MaterialIcons name={service.icon as any} size={28} color={service.color} />
@@ -204,6 +265,99 @@ export default function Health() {
           ))}
         </View>
       </ScrollView>
+
+      {/* Book Appointment Modal */}
+      <Modal
+        visible={showBookingModal}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowBookingModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { paddingBottom: insets.bottom + 20 }]}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Book Appointment</Text>
+              <TouchableOpacity onPress={() => setShowBookingModal(false)}>
+                <MaterialIcons name="close" size={24} color="#0D1140" />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView style={styles.modalBody}>
+              <Text style={styles.appointmentTypeTitle}>Select Appointment Type</Text>
+              
+              {[
+                { type: 'General Checkup', icon: 'medical-services', color: '#10b981' },
+                { type: 'Mental Health Consultation', icon: 'psychology', color: '#8b5cf6' },
+                { type: 'Vaccination', icon: 'vaccines', color: '#3b82f6' },
+                { type: 'Sports Injury', icon: 'healing', color: '#f59e0b' },
+                { type: 'Prescription Refill', icon: 'medication', color: '#ec4899' },
+              ].map((appointment, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={styles.appointmentTypeCard}
+                  onPress={() => handleBookAppointment(appointment.type)}
+                >
+                  <View style={[styles.appointmentTypeIcon, { backgroundColor: appointment.color + '15' }]}>
+                    <MaterialIcons name={appointment.icon as any} size={28} color={appointment.color} />
+                  </View>
+                  <Text style={styles.appointmentTypeText}>{appointment.type}</Text>
+                  <MaterialIcons name="chevron-right" size={24} color="#9aa0c7" />
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Prescriptions Modal */}
+      <Modal
+        visible={showPrescriptionsModal}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowPrescriptionsModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { paddingBottom: insets.bottom + 20 }]}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>My Prescriptions</Text>
+              <TouchableOpacity onPress={() => setShowPrescriptionsModal(false)}>
+                <MaterialIcons name="close" size={24} color="#0D1140" />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView style={styles.modalBody}>
+              <Text style={styles.prescriptionSectionTitle}>Active Prescriptions</Text>
+              
+              {[
+                { name: 'Amoxicillin 500mg', dosage: 'Take 1 tablet twice daily', refills: '2 refills left', expires: 'Expires: Mar 15, 2025' },
+                { name: 'Vitamin D3 1000IU', dosage: 'Take 1 tablet daily', refills: '3 refills left', expires: 'Expires: Jun 20, 2025' },
+              ].map((prescription, index) => (
+                <View key={index} style={styles.prescriptionCard}>
+                  <View style={styles.prescriptionHeader}>
+                    <MaterialCommunityIcons name="pill" size={24} color="#8b5cf6" />
+                    <Text style={styles.prescriptionName}>{prescription.name}</Text>
+                  </View>
+                  <Text style={styles.prescriptionDosage}>{prescription.dosage}</Text>
+                  <Text style={styles.prescriptionRefills}>{prescription.refills}</Text>
+                  <Text style={styles.prescriptionExpires}>{prescription.expires}</Text>
+                  <TouchableOpacity
+                    style={styles.refillButton}
+                    onPress={() => {
+                      setShowPrescriptionsModal(false);
+                      Alert.alert('Refill Request', `Request refill for ${prescription.name}?`, [
+                        { text: 'Cancel', style: 'cancel' },
+                        { text: 'Request', onPress: () => Alert.alert('Success', 'Refill request submitted!') },
+                      ]);
+                    }}
+                  >
+                    <Text style={styles.refillButtonText}>Request Refill</Text>
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -260,4 +414,24 @@ const styles = StyleSheet.create({
   visitDoctor: { fontSize: 13, color: '#6b7280', marginBottom: 6 },
   visitNotes: { fontSize: 13, color: '#9aa0c7', marginBottom: 6 },
   visitDate: { fontSize: 12, color: '#9aa0c7' },
+
+  // Modals
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(13,17,64,0.5)', justifyContent: 'flex-end' },
+  modalContent: { backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, maxHeight: '80%' },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, borderBottomWidth: 1, borderBottomColor: '#e8eaf0' },
+  modalTitle: { fontSize: 20, fontWeight: '700', color: '#0D1140' },
+  modalBody: { padding: 20 },
+  appointmentTypeTitle: { fontSize: 16, fontWeight: '700', color: '#0D1140', marginBottom: 16 },
+  appointmentTypeCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#f8f9fb', borderRadius: 16, padding: 16, marginBottom: 12, gap: 12 },
+  appointmentTypeIcon: { width: 52, height: 52, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
+  appointmentTypeText: { flex: 1, fontSize: 15, fontWeight: '600', color: '#0D1140' },
+  prescriptionSectionTitle: { fontSize: 16, fontWeight: '700', color: '#0D1140', marginBottom: 16 },
+  prescriptionCard: { backgroundColor: '#f8f9fb', borderRadius: 16, padding: 18, marginBottom: 16 },
+  prescriptionHeader: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 12 },
+  prescriptionName: { fontSize: 16, fontWeight: '700', color: '#0D1140' },
+  prescriptionDosage: { fontSize: 14, color: '#6b7280', marginBottom: 6 },
+  prescriptionRefills: { fontSize: 13, color: '#10b981', fontWeight: '600', marginBottom: 4 },
+  prescriptionExpires: { fontSize: 12, color: '#9aa0c7', marginBottom: 12 },
+  refillButton: { backgroundColor: '#8b5cf6', borderRadius: 10, paddingVertical: 10, alignItems: 'center' },
+  refillButtonText: { fontSize: 14, fontWeight: '600', color: '#fff' },
 });

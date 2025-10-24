@@ -1,7 +1,7 @@
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import React from 'react';
+import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -9,8 +9,13 @@ export default function MealPlan() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
 
+  const [showAddFundsModal, setShowAddFundsModal] = useState(false);
+  const [showMenuModal, setShowMenuModal] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState<any>(null);
+  const [addAmount, setAddAmount] = useState('');
+  const [flexBalance, setFlexBalance] = useState(82.50);
+
   const mealBalance = 145;
-  const flexBalance = 82.50;
   const totalMeals = 200;
   const mealsUsed = 55;
   const mealsRemaining = totalMeals - mealsUsed;
@@ -62,6 +67,36 @@ export default function MealPlan() {
     { id: '4', location: 'Library Quick Bites', type: 'Snack', date: 'Yesterday, 3:45 PM', flex: 4.50 },
   ];
 
+  const handleAddFunds = () => {
+    if (!addAmount || parseFloat(addAmount) <= 0) {
+      Alert.alert('Invalid Amount', 'Please enter a valid amount to add');
+      return;
+    }
+
+    const amount = parseFloat(addAmount);
+    Alert.alert(
+      'Add Funds',
+      `Add £${amount.toFixed(2)} to your Flex Balance?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Add Funds',
+          onPress: () => {
+            setFlexBalance(prev => prev + amount);
+            setShowAddFundsModal(false);
+            setAddAmount('');
+            Alert.alert('Success', `£${amount.toFixed(2)} added to your Flex Balance!`);
+          },
+        },
+      ]
+    );
+  };
+
+  const handleViewMenu = (location: any) => {
+    setSelectedLocation(location);
+    setShowMenuModal(true);
+  };
+
   return (
     <View style={styles.page}>
       {/* Header */}
@@ -107,7 +142,7 @@ export default function MealPlan() {
                 <Text style={styles.flexLabel}>Flex Balance</Text>
                 <Text style={styles.flexAmount}>£{flexBalance.toFixed(2)}</Text>
               </View>
-              <TouchableOpacity style={styles.addFundsButton} onPress={() => alert('Add funds coming soon')}>
+              <TouchableOpacity style={styles.addFundsButton} onPress={() => setShowAddFundsModal(true)}>
                 <MaterialIcons name="add" size={20} color="#10b981" />
               </TouchableOpacity>
             </View>
@@ -121,7 +156,7 @@ export default function MealPlan() {
             <TouchableOpacity
               key={location.id}
               style={styles.locationCard}
-              onPress={() => alert(`View menu for ${location.name}`)}
+              onPress={() => handleViewMenu(location)}
             >
               <View style={[styles.locationIcon, { backgroundColor: location.color + '15' }]}>
                 <MaterialIcons name={location.icon as any} size={26} color={location.color} />
@@ -187,6 +222,109 @@ export default function MealPlan() {
           ))}
         </View>
       </ScrollView>
+
+      {/* Add Funds Modal */}
+      <Modal
+        visible={showAddFundsModal}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowAddFundsModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { paddingBottom: insets.bottom + 20 }]}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Add Flex Funds</Text>
+              <TouchableOpacity onPress={() => setShowAddFundsModal(false)}>
+                <MaterialIcons name="close" size={24} color="#0D1140" />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.modalBody}>
+              <Text style={styles.currentBalanceText}>Current Balance: £{flexBalance.toFixed(2)}</Text>
+              
+              <Text style={styles.inputLabel}>Amount to Add (£)</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="0.00"
+                keyboardType="decimal-pad"
+                value={addAmount}
+                onChangeText={setAddAmount}
+              />
+
+              <View style={styles.quickAmounts}>
+                {[10, 25, 50, 100].map((amount) => (
+                  <TouchableOpacity
+                    key={amount}
+                    style={styles.quickAmountButton}
+                    onPress={() => setAddAmount(amount.toString())}
+                  >
+                    <Text style={styles.quickAmountText}>£{amount}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              <TouchableOpacity style={styles.submitButton} onPress={handleAddFunds}>
+                <Text style={styles.submitButtonText}>Add Funds</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Menu Modal */}
+      <Modal
+        visible={showMenuModal}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowMenuModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { paddingBottom: insets.bottom + 20 }]}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>{selectedLocation?.name}</Text>
+              <TouchableOpacity onPress={() => setShowMenuModal(false)}>
+                <MaterialIcons name="close" size={24} color="#0D1140" />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView style={styles.modalBody}>
+              <View style={styles.menuInfoCard}>
+                <MaterialIcons name="schedule" size={20} color="#10b981" />
+                <Text style={styles.menuInfoText}>{selectedLocation?.hours}</Text>
+              </View>
+
+              <Text style={styles.menuSectionTitle}>Today's Menu</Text>
+              
+              {[
+                { name: 'Grilled Chicken & Rice', price: '£6.50', category: 'Main Course' },
+                { name: 'Vegetable Pasta', price: '£5.75', category: 'Main Course' },
+                { name: 'Caesar Salad', price: '£4.50', category: 'Salad' },
+                { name: 'Fish & Chips', price: '£7.00', category: 'Main Course' },
+                { name: 'Fresh Fruit Bowl', price: '£3.25', category: 'Dessert' },
+              ].map((item, index) => (
+                <View key={index} style={styles.menuItem}>
+                  <View style={styles.menuItemInfo}>
+                    <Text style={styles.menuItemName}>{item.name}</Text>
+                    <Text style={styles.menuItemCategory}>{item.category}</Text>
+                  </View>
+                  <Text style={styles.menuItemPrice}>{item.price}</Text>
+                </View>
+              ))}
+
+              <TouchableOpacity
+                style={styles.directionsButton}
+                onPress={() => {
+                  setShowMenuModal(false);
+                  Alert.alert('Directions', `Walking directions to ${selectedLocation?.name}\n\n${selectedLocation?.distance}`);
+                }}
+              >
+                <MaterialIcons name="directions-walk" size={20} color="#fff" />
+                <Text style={styles.directionsButtonText}>Get Directions</Text>
+              </TouchableOpacity>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -242,4 +380,29 @@ const styles = StyleSheet.create({
   mealValue: { alignItems: 'flex-end' },
   mealSwipes: { fontSize: 14, fontWeight: '700', color: '#f59e0b' },
   mealFlex: { fontSize: 14, fontWeight: '700', color: '#10b981' },
+
+  // Modals
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(13,17,64,0.5)', justifyContent: 'flex-end' },
+  modalContent: { backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, maxHeight: '85%' },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, borderBottomWidth: 1, borderBottomColor: '#e8eaf0' },
+  modalTitle: { fontSize: 20, fontWeight: '700', color: '#0D1140' },
+  modalBody: { padding: 20 },
+  currentBalanceText: { fontSize: 16, fontWeight: '600', color: '#10b981', marginBottom: 20, textAlign: 'center' },
+  inputLabel: { fontSize: 14, fontWeight: '600', color: '#0D1140', marginBottom: 8 },
+  input: { backgroundColor: '#f8f9fb', borderRadius: 12, padding: 16, fontSize: 16, color: '#0D1140', borderWidth: 1, borderColor: '#e8eaf0', marginBottom: 16 },
+  quickAmounts: { flexDirection: 'row', gap: 10, marginBottom: 24 },
+  quickAmountButton: { flex: 1, backgroundColor: '#f8f9fb', borderRadius: 12, paddingVertical: 12, alignItems: 'center', borderWidth: 1, borderColor: '#e8eaf0' },
+  quickAmountText: { fontSize: 15, fontWeight: '600', color: '#10b981' },
+  submitButton: { backgroundColor: '#10b981', borderRadius: 12, padding: 16, alignItems: 'center' },
+  submitButtonText: { fontSize: 16, fontWeight: '700', color: '#fff' },
+  menuInfoCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#10b98115', borderRadius: 12, padding: 14, marginBottom: 20, gap: 10 },
+  menuInfoText: { fontSize: 14, fontWeight: '600', color: '#10b981' },
+  menuSectionTitle: { fontSize: 18, fontWeight: '700', color: '#0D1140', marginBottom: 16 },
+  menuItem: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: '#f8f9fb' },
+  menuItemInfo: { flex: 1 },
+  menuItemName: { fontSize: 15, fontWeight: '600', color: '#0D1140', marginBottom: 4 },
+  menuItemCategory: { fontSize: 13, color: '#9aa0c7' },
+  menuItemPrice: { fontSize: 16, fontWeight: '700', color: '#10b981' },
+  directionsButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#0D1140', borderRadius: 12, padding: 16, marginTop: 20, gap: 8 },
+  directionsButtonText: { fontSize: 15, fontWeight: '600', color: '#fff' },
 });
