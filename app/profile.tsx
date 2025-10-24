@@ -182,13 +182,13 @@ export default function Profile() {
 }
 
 const styles = StyleSheet.create({
-  page: { flex: 1, backgroundColor: '#0D1140' },
+  page: { flex: 1, backgroundColor: '#fff' },
   header: { paddingHorizontal: 16, paddingBottom: 16, backgroundColor: '#0D1140', flexDirection: 'row', alignItems: 'center' },
   backButton: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', marginRight: 8 },
   headerTitle: { fontSize: 20, fontWeight: '700', color: '#fff' },
-  scrollView: { flex: 1 },
+  scrollView: { flex: 1, backgroundColor: '#fff' },
   // White section starts here
-  whiteSection: { backgroundColor: '#fff', flex: 1, marginTop: 0, paddingTop: 32 },
+  whiteSection: { backgroundColor: '#fff', paddingTop: 32, paddingBottom: 40 },
   profileHeader: { alignItems: 'center', marginBottom: 24 },
   avatarContainer: { position: 'relative', marginBottom: 16 },
   avatarLarge: { width: 100, height: 100, borderRadius: 50, backgroundColor: '#3b4a9e', alignItems: 'center', justifyContent: 'center' },
