@@ -30,13 +30,6 @@ export default function TabsLayout() {
         tabBarIconStyle: { marginBottom: -2 },
         tabBarItemStyle: { marginHorizontal: 8, borderRadius: 16 },
         tabBarHideOnKeyboard: true,
-        tabBarIndicatorStyle: {
-          height: 4,
-          borderRadius: 2,
-          backgroundColor: '#3A7BFF',
-          position: 'absolute',
-          bottom: 8,
-        },
       }}>
       {/* Hide the default index screen from the tab bar and routing */}
       <Tabs.Screen name="index" options={{ href: null }} />

@@ -4,11 +4,20 @@ import React from 'react';
 import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+interface MenuItem {
+  icon: string;
+  iconLib: string;
+  label: string;
+  badge?: string;
+  subtitle?: string;
+  onPress: () => void;
+}
+
 export default function Profile() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
 
-  const menuSections = [
+  const menuSections: { id: string; items: MenuItem[] }[] = [
     {
       id: 'main',
       items: [
