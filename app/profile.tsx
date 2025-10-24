@@ -2,7 +2,7 @@ import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Alert, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface MenuItem {
@@ -18,10 +18,9 @@ export default function Profile() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const [profileImage, setProfileImage] = useState<string | null>(null);
-  const [isEditingProfile, setIsEditingProfile] = useState(false);
-  const [studentName, setStudentName] = useState('Lords Jackrich');
-  const [studentEmail, setStudentEmail] = useState('lj8607b@gre.ac.uk');
-  const [studentId, setStudentId] = useState('8607');
+  const studentName = 'Lords Jackrich';
+  const studentEmail = 'lj8607b@gre.ac.uk';
+  const studentId = '8607';
 
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -72,47 +71,32 @@ export default function Profile() {
     );
   };
 
-  const handleEditProfile = () => {
-    setIsEditingProfile(true);
-    Alert.alert('Edit Profile', 'You can now edit your name, email, and student ID', [
-      { text: 'OK' }
-    ]);
-  };
-
-  const handleSaveProfile = () => {
-    setIsEditingProfile(false);
-    Alert.alert('Profile Updated', 'Your profile has been saved successfully');
-  };
-
   const menuSections: { id: string; title?: string; items: MenuItem[] }[] = [
     {
       id: 'academic',
       title: 'Academic',
       items: [
-        { icon: 'school', iconLib: 'MaterialIcons', label: 'Grades/GPA', onPress: () => Alert.alert('Grades/GPA', 'View your academic performance and GPA') },
-        { icon: 'event', iconLib: 'MaterialIcons', label: 'Timetable', onPress: () => router.push('/(tabs)/timetable') },
-        { icon: 'book', iconLib: 'MaterialIcons', label: 'Modules', onPress: () => router.push('/(tabs)/modules') },
-        { icon: 'assignment', iconLib: 'MaterialIcons', label: 'Assignments', onPress: () => Alert.alert('Assignments', 'View and manage your assignments') },
+        { icon: 'school', iconLib: 'MaterialIcons', label: 'Grades/GPA', subtitle: 'View your academic performance', onPress: () => router.push('/grades') },
       ],
     },
     {
       id: 'services',
       title: 'Services',
       items: [
-        { icon: 'wallet', iconLib: 'MaterialCommunityIcons', label: 'Finance', onPress: () => Alert.alert('Finance', 'View tuition fees, payments, and financial aid') },
-        { icon: 'library-books', iconLib: 'MaterialIcons', label: 'Library', onPress: () => Alert.alert('Library', 'Access library resources and reservations') },
-        { icon: 'local-dining', iconLib: 'MaterialIcons', label: 'Meal Plan', onPress: () => Alert.alert('Meal Plan', 'Manage your campus meal plan') },
-        { icon: 'health-and-safety', iconLib: 'MaterialIcons', label: 'Health Services', onPress: () => Alert.alert('Health Services', 'Book health appointments and view records') },
+        { icon: 'wallet', iconLib: 'MaterialCommunityIcons', label: 'Finance', subtitle: 'Tuition & payments', onPress: () => router.push('/finance') },
+        { icon: 'library-books', iconLib: 'MaterialIcons', label: 'Library', subtitle: 'Books & resources', onPress: () => router.push('/library') },
+        { icon: 'local-dining', iconLib: 'MaterialIcons', label: 'Meal Plan', subtitle: 'Campus dining', onPress: () => router.push('/meal-plan') },
+        { icon: 'health-and-safety', iconLib: 'MaterialIcons', label: 'Health Services', subtitle: 'Medical appointments', onPress: () => router.push('/health') },
       ],
     },
     {
       id: 'settings',
       title: 'Settings',
       items: [
-        { icon: 'notifications', iconLib: 'MaterialIcons', label: 'Notifications', onPress: () => Alert.alert('Notifications', 'Manage your notification preferences') },
-        { icon: 'security', iconLib: 'MaterialIcons', label: 'Privacy & Security', onPress: () => Alert.alert('Privacy', 'Manage your privacy and security settings') },
-        { icon: 'help', iconLib: 'MaterialIcons', label: 'Help & Support', onPress: () => Alert.alert('Help', 'Get help and contact support') },
-        { icon: 'logout', iconLib: 'MaterialIcons', label: 'Sign Out', onPress: () => Alert.alert('Sign Out', 'Are you sure you want to sign out?', [{ text: 'Cancel' }, { text: 'Sign Out', style: 'destructive' }]) },
+        { icon: 'notifications', iconLib: 'MaterialIcons', label: 'Notifications', onPress: () => router.push('/notifications') },
+        { icon: 'security', iconLib: 'MaterialIcons', label: 'Privacy & Security', onPress: () => router.push('/privacy') },
+        { icon: 'help', iconLib: 'MaterialIcons', label: 'Help & Support', onPress: () => router.push('/support') },
+        { icon: 'logout', iconLib: 'MaterialIcons', label: 'Sign Out', onPress: () => Alert.alert('Sign Out', 'Are you sure you want to sign out?', [{ text: 'Cancel' }, { text: 'Sign Out', style: 'destructive', onPress: () => router.replace('/') }]) },
       ],
     },
   ];
@@ -151,45 +135,10 @@ export default function Profile() {
           </TouchableOpacity>
 
           <View style={styles.profileInfo}>
-            {isEditingProfile ? (
-              <>
-                <TextInput
-                  style={styles.nameInput}
-                  value={studentName}
-                  onChangeText={setStudentName}
-                  placeholder="Full Name"
-                  placeholderTextColor="#9aa0c7"
-                />
-                <TextInput
-                  style={styles.emailInput}
-                  value={studentEmail}
-                  onChangeText={setStudentEmail}
-                  placeholder="Email"
-                  keyboardType="email-address"
-                  placeholderTextColor="#9aa0c7"
-                />
-                <TextInput
-                  style={styles.emailInput}
-                  value={studentId}
-                  onChangeText={setStudentId}
-                  placeholder="Student ID"
-                  placeholderTextColor="#9aa0c7"
-                />
-                <TouchableOpacity style={styles.saveButton} onPress={handleSaveProfile}>
-                  <Text style={styles.saveButtonText}>Save Changes</Text>
-                </TouchableOpacity>
-              </>
-            ) : (
-              <>
-                <Text style={styles.profileName}>{studentName}</Text>
-                <Text style={styles.profileEmail}>{studentEmail}</Text>
-                <Text style={styles.profileId}>Student ID: {studentId}</Text>
-                <TouchableOpacity style={styles.editButton} onPress={handleEditProfile}>
-                  <MaterialIcons name="edit" size={16} color="#0D1140" />
-                  <Text style={styles.editButtonText}>Edit Profile</Text>
-                </TouchableOpacity>
-              </>
-            )}
+            <Text style={styles.profileName}>{studentName}</Text>
+            <Text style={styles.profileEmail}>{studentEmail}</Text>
+            <Text style={styles.profileId}>Student ID: {studentId}</Text>
+            <Text style={styles.profileNote}>Profile data synced from university database</Text>
           </View>
 
           {/* Menu Sections */}
@@ -249,14 +198,8 @@ const styles = StyleSheet.create({
   profileInfo: { alignItems: 'center', paddingHorizontal: 24, marginBottom: 32 },
   profileName: { fontSize: 26, fontWeight: '700', color: '#0D1140', marginBottom: 8 },
   profileEmail: { fontSize: 15, color: '#6b7280', marginBottom: 4 },
-  profileId: { fontSize: 14, color: '#9aa0c7', marginBottom: 16 },
-  editButton: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#f0f2f5', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20 },
-  editButtonText: { fontSize: 14, fontWeight: '600', color: '#0D1140', marginLeft: 6 },
-  // Edit mode inputs
-  nameInput: { fontSize: 26, fontWeight: '700', color: '#0D1140', marginBottom: 8, borderBottomWidth: 1, borderBottomColor: '#e0e0e0', width: '100%', textAlign: 'center', paddingVertical: 8 },
-  emailInput: { fontSize: 15, color: '#6b7280', marginBottom: 8, borderBottomWidth: 1, borderBottomColor: '#e0e0e0', width: '100%', textAlign: 'center', paddingVertical: 8 },
-  saveButton: { backgroundColor: '#3b4a9e', paddingHorizontal: 24, paddingVertical: 12, borderRadius: 20, marginTop: 16 },
-  saveButtonText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  profileId: { fontSize: 14, color: '#9aa0c7', marginBottom: 8 },
+  profileNote: { fontSize: 12, color: '#9aa0c7', fontStyle: 'italic', marginTop: 4 },
   // Menu sections on white background
   menuSectionWhite: { paddingHorizontal: 16, marginBottom: 24 },
   sectionTitle: { fontSize: 14, fontWeight: '700', color: '#9aa0c7', marginBottom: 12, marginLeft: 4, textTransform: 'uppercase', letterSpacing: 0.5 },
