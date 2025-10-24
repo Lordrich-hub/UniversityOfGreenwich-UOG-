@@ -18,22 +18,8 @@ type DaySchedule = {
   credits: number;
 };
 
-type BuildingLocation = {
-  name: string;
-  x: number; // percentage from left
-  y: number; // percentage from top
-  color: string;
-};
-
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
 const WEEKS = ['This Week', 'Next Week', 'Week After'];
-
-// Campus buildings for custom map
-const CAMPUS_BUILDINGS: BuildingLocation[] = [
-  { name: 'Stockwell Street', x: 30, y: 40, color: '#8b5cf6' },
-  { name: 'Queen Anne', x: 50, y: 50, color: '#3b82f6' },
-  { name: 'Dreadnought', x: 70, y: 45, color: '#10b981' },
-];
 
 // Schedules for different weeks
 const THIS_WEEK_SCHEDULE: { [key: string]: DaySchedule[] } = {
@@ -188,20 +174,25 @@ export default function Timetable() {
           </View>
         </View>
 
-        {/* Week Selector */}
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.weekSelector}>
-          {WEEKS.map(week => (
-            <TouchableOpacity
-              key={week}
-              style={[styles.weekButton, selectedWeek === week && styles.weekButtonActive]}
-              onPress={() => setSelectedWeek(week)}
-            >
-              <Text style={[styles.weekText, selectedWeek === week && styles.weekTextActive]}>
-                {week}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
+        {/* Week Selector - Highly Visible */}
+        <View style={styles.weekSelectorContainer}>
+          <Text style={styles.weekSelectorLabel}>📅 Select Week</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.weekSelector}>
+            {WEEKS.map(week => (
+              <TouchableOpacity
+                key={week}
+                style={[styles.weekButton, selectedWeek === week && styles.weekButtonActive]}
+                onPress={() => setSelectedWeek(week)}
+                activeOpacity={0.7}
+              >
+                <Text style={[styles.weekText, selectedWeek === week && styles.weekTextActive]}>
+                  {week}
+                </Text>
+                {selectedWeek === week && <View style={styles.weekButtonIndicator} />}
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
 
         {/* Day Selector */}
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.daySelector}>
@@ -373,9 +364,12 @@ export default function Timetable() {
             {selectedClass && (
               <>
                 <View style={styles.mapModalHeader}>
-                  <View>
-                    <Text style={styles.mapModalTitle}>🗺️ Campus Map</Text>
-                    <Text style={styles.mapModalSubtitle}>{selectedClass.building} Building - {selectedClass.room}</Text>
+                  <View style={styles.mapHeaderLeft}>
+                    <MaterialIcons name="place" size={28} color="#ea4335" />
+                    <View>
+                      <Text style={styles.mapModalTitle}>{selectedClass.building} Building</Text>
+                      <Text style={styles.mapModalSubtitle}>📍 {selectedClass.room}</Text>
+                    </View>
                   </View>
                   <TouchableOpacity
                     style={styles.mapCloseButton}
@@ -385,56 +379,91 @@ export default function Timetable() {
                   </TouchableOpacity>
                 </View>
 
-                {/* Custom Campus Map */}
-                <View style={styles.campusMapContainer}>
+                {/* Google Maps Style Campus Map */}
+                <ScrollView style={styles.campusMapContainer} showsVerticalScrollIndicator={false}>
                   <View style={styles.campusMap}>
-                    {/* River Thames */}
-                    <View style={styles.river}>
-                      <Text style={styles.riverText}>~ River Thames ~</Text>
-                    </View>
+                    {/* Map Background - Satellite Style */}
+                    <View style={styles.mapBackground}>
+                      {/* River Thames - Blue */}
+                      <View style={styles.river} />
+                      
+                      {/* Streets - Yellow/Gray */}
+                      <View style={styles.streetHorizontal1} />
+                      <View style={styles.streetHorizontal2} />
+                      <View style={styles.streetVertical} />
+                      
+                      {/* Green Areas - Parks */}
+                      <View style={styles.parkArea1} />
+                      <View style={styles.parkArea2} />
 
-                    {/* Buildings */}
-                    {CAMPUS_BUILDINGS.map((building) => {
-                      const isSelected = selectedClass.building.includes(building.name);
-                      return (
-                        <View
-                          key={building.name}
-                          style={[
-                            styles.building,
-                            {
-                              left: `${building.x}%`,
-                              top: `${building.y}%`,
-                              backgroundColor: isSelected ? building.color : '#e5e7eb',
-                              transform: [{ scale: isSelected ? 1.2 : 1 }],
-                              borderWidth: isSelected ? 3 : 1,
-                              borderColor: isSelected ? building.color : '#9ca3af',
-                            },
-                          ]}
-                        >
-                          {isSelected && <MaterialIcons name="location-on" size={24} color="#fff" />}
-                          <Text style={[styles.buildingText, { color: isSelected ? '#fff' : '#6b7280' }]}>
-                            {building.name}
-                          </Text>
+                      {/* Campus Buildings - 3D Style */}
+                      <View style={styles.buildingStockwell}>
+                        <View style={[styles.buildingTop, { backgroundColor: selectedClass.building.includes('Stockwell') ? '#ea4335' : '#7c3aed' }]}>
+                          {selectedClass.building.includes('Stockwell') && (
+                            <MaterialIcons name="place" size={32} color="#fff" />
+                          )}
                         </View>
-                      );
-                    })}
+                        <View style={styles.buildingLabel}>
+                          <Text style={styles.buildingLabelText}>Stockwell Street</Text>
+                          <Text style={styles.buildingSubtext}>Computing & IT</Text>
+                        </View>
+                      </View>
 
-                    {/* Campus Pathways */}
-                    <View style={styles.pathway1} />
-                    <View style={styles.pathway2} />
+                      <View style={styles.buildingQueenAnne}>
+                        <View style={[styles.buildingTop, { backgroundColor: selectedClass.building.includes('Queen') ? '#ea4335' : '#0ea5e9' }]}>
+                          {selectedClass.building.includes('Queen') && (
+                            <MaterialIcons name="place" size={32} color="#fff" />
+                          )}
+                        </View>
+                        <View style={styles.buildingLabel}>
+                          <Text style={styles.buildingLabelText}>Queen Anne</Text>
+                          <Text style={styles.buildingSubtext}>Main Campus</Text>
+                        </View>
+                      </View>
+
+                      <View style={styles.buildingDreadnought}>
+                        <View style={[styles.buildingTop, { backgroundColor: selectedClass.building.includes('Dreadnought') ? '#ea4335' : '#10b981' }]}>
+                          {selectedClass.building.includes('Dreadnought') && (
+                            <MaterialIcons name="place" size={32} color="#fff" />
+                          )}
+                        </View>
+                        <View style={styles.buildingLabel}>
+                          <Text style={styles.buildingLabelText}>Dreadnought</Text>
+                          <Text style={styles.buildingSubtext}>Library & Study</Text>
+                        </View>
+                      </View>
+
+                      {/* Map Labels */}
+                      <View style={styles.riverLabel}>
+                        <Text style={styles.riverLabelText}>River Thames</Text>
+                      </View>
+
+                      {/* Compass */}
+                      <View style={styles.compass}>
+                        <Text style={styles.compassText}>N</Text>
+                        <MaterialIcons name="navigation" size={24} color="#fff" />
+                      </View>
+                    </View>
                   </View>
 
-                  {/* Legend */}
-                  <View style={styles.mapLegend}>
-                    <MaterialIcons name="place" size={20} color={selectedClass.color} />
-                    <Text style={styles.legendText}>Your class location</Text>
+                  {/* Directions Card */}
+                  <View style={styles.directionsCard}>
+                    <MaterialIcons name="directions-walk" size={24} color="#0D1140" />
+                    <View style={styles.directionsInfo}>
+                      <Text style={styles.directionsTitle}>Walking Directions</Text>
+                      <Text style={styles.directionsText}>
+                        {selectedClass.building.includes('Stockwell') && '5 min walk from main entrance'}
+                        {selectedClass.building.includes('Queen') && '2 min walk from main entrance'}
+                        {selectedClass.building.includes('Dreadnought') && '3 min walk from main entrance'}
+                      </Text>
+                    </View>
                   </View>
-                </View>
+                </ScrollView>
 
-                <View style={styles.mapInfo}>
-                  <MaterialIcons name="info-outline" size={20} color="#6b7280" />
-                  <Text style={styles.mapInfoText}>
-                    University of Greenwich - Maritime Greenwich Campus
+                <View style={styles.mapFooter}>
+                  <MaterialIcons name="location-city" size={20} color="#6b7280" />
+                  <Text style={styles.mapFooterText}>
+                    University of Greenwich • Maritime Greenwich Campus
                   </Text>
                 </View>
               </>
@@ -461,31 +490,47 @@ const styles = StyleSheet.create({
   statLabel: { fontSize: 11, color: '#6b7280', textAlign: 'center' },
   statEmoji: { fontSize: 20, position: 'absolute', top: 8, right: 8 },
 
-  weekSelector: { paddingHorizontal: 16, paddingVertical: 16, maxHeight: 70, marginBottom: 8 },
+  weekSelectorContainer: { 
+    paddingHorizontal: 16, 
+    paddingVertical: 12, 
+    backgroundColor: '#fff',
+    borderBottomWidth: 2,
+    borderBottomColor: '#e5e7eb',
+  },
+  weekSelectorLabel: { 
+    fontSize: 16, 
+    fontWeight: '800', 
+    color: '#0D1140', 
+    marginBottom: 12,
+  },
+  weekSelector: { maxHeight: 70 },
   weekButton: { 
-    paddingHorizontal: 24, 
-    paddingVertical: 14, 
+    paddingHorizontal: 28, 
+    paddingVertical: 16, 
     marginRight: 12, 
-    borderRadius: 20, 
+    borderRadius: 25, 
     backgroundColor: '#f8f9fb',
-    borderWidth: 2,
-    borderColor: '#e5e7eb',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    borderWidth: 3,
+    borderColor: '#0D1140',
+    minWidth: 140,
+    alignItems: 'center',
+    position: 'relative',
   },
   weekButtonActive: { 
     backgroundColor: '#0D1140',
     borderColor: '#0D1140',
-    shadowColor: '#0D1140',
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 4,
   },
-  weekText: { fontSize: 15, fontWeight: '700', color: '#6b7280' },
+  weekText: { fontSize: 16, fontWeight: '800', color: '#0D1140' },
   weekTextActive: { color: '#fff' },
+  weekButtonIndicator: {
+    position: 'absolute',
+    bottom: -2,
+    left: '25%',
+    right: '25%',
+    height: 4,
+    backgroundColor: '#8b5cf6',
+    borderRadius: 2,
+  },
 
   daySelector: { paddingHorizontal: 16, paddingVertical: 8, maxHeight: 60 },
   dayButton: { paddingHorizontal: 20, paddingVertical: 12, marginRight: 8, borderRadius: 20, backgroundColor: '#f8f9fb', alignItems: 'center', minWidth: 70 },
@@ -536,82 +581,228 @@ const styles = StyleSheet.create({
   reminderButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 16, borderRadius: 16, backgroundColor: '#f8f9fb' },
   reminderButtonText: { fontSize: 16, fontWeight: '700', color: '#0D1140' },
 
-  // Map Modal Styles
-  mapModalOverlay: { flex: 1, backgroundColor: 'rgba(13,17,64,0.9)' },
-  mapModalContent: { flex: 1, backgroundColor: '#fff', marginTop: 60, borderTopLeftRadius: 24, borderTopRightRadius: 24 },
-  mapModalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 24, backgroundColor: '#fff', borderBottomWidth: 2, borderBottomColor: '#e5e7eb', borderTopLeftRadius: 24, borderTopRightRadius: 24 },
-  mapModalTitle: { fontSize: 22, fontWeight: '800', color: '#0D1140' },
-  mapModalSubtitle: { fontSize: 14, color: '#6b7280', marginTop: 4, fontWeight: '600' },
-  mapCloseButton: { padding: 8, backgroundColor: '#f8f9fb', borderRadius: 12 },
-  
-  // Custom Campus Map Styles
-  campusMapContainer: { flex: 1, backgroundColor: '#f8f9fb' },
-  campusMap: { 
-    flex: 1, 
-    backgroundColor: '#e0f2e9', 
-    margin: 20, 
-    borderRadius: 20, 
-    position: 'relative',
-    borderWidth: 3,
-    borderColor: '#0D1140',
+  // Map Modal Styles - Google Maps Design
+  mapModalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.8)' },
+  mapModalContent: { flex: 1, backgroundColor: '#fff', marginTop: 50, borderTopLeftRadius: 20, borderTopRightRadius: 20 },
+  mapModalHeader: { 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    alignItems: 'center', 
+    padding: 20, 
+    backgroundColor: '#fff', 
+    borderBottomWidth: 1, 
+    borderBottomColor: '#e0e0e0',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
   },
+  mapHeaderLeft: { flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 },
+  mapModalTitle: { fontSize: 18, fontWeight: '700', color: '#0D1140' },
+  mapModalSubtitle: { fontSize: 13, color: '#5f6368', marginTop: 2 },
+  mapCloseButton: { padding: 8, backgroundColor: '#f1f3f4', borderRadius: 20 },
+  
+  // Google Maps Style Campus Map
+  campusMapContainer: { flex: 1, backgroundColor: '#e5e3df' },
+  campusMap: { 
+    minHeight: 500,
+    backgroundColor: '#e5e3df', 
+    margin: 0,
+    position: 'relative',
+  },
+  mapBackground: {
+    width: '100%',
+    height: '100%',
+    position: 'relative',
+    backgroundColor: '#e5e3df',
+  },
+  
+  // River Thames - Google Maps Water Color
   river: { 
     position: 'absolute', 
     bottom: 0, 
     left: 0, 
     right: 0, 
-    height: '20%', 
-    backgroundColor: '#7dd3fc',
-    borderBottomLeftRadius: 17,
-    borderBottomRightRadius: 17,
-    justifyContent: 'center',
-    alignItems: 'center',
+    height: '25%', 
+    backgroundColor: '#aad3df',
   },
-  riverText: { fontSize: 16, fontWeight: '700', color: '#0369a1', opacity: 0.7 },
-  building: {
+  
+  // Streets - Google Maps Style
+  streetHorizontal1: {
     position: 'absolute',
-    width: 100,
+    top: '30%',
+    left: 0,
+    right: 0,
+    height: 8,
+    backgroundColor: '#fff',
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: '#d4d4d4',
+  },
+  streetHorizontal2: {
+    position: 'absolute',
+    top: '60%',
+    left: 0,
+    right: 0,
+    height: 8,
+    backgroundColor: '#fff',
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: '#d4d4d4',
+  },
+  streetVertical: {
+    position: 'absolute',
+    left: '50%',
+    top: 0,
+    bottom: '25%',
+    width: 8,
+    backgroundColor: '#fff',
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
+    borderColor: '#d4d4d4',
+  },
+  
+  // Park Areas - Green
+  parkArea1: {
+    position: 'absolute',
+    top: '10%',
+    left: '10%',
+    width: '30%',
+    height: '15%',
+    backgroundColor: '#c8e6c9',
+    borderRadius: 8,
+  },
+  parkArea2: {
+    position: 'absolute',
+    top: '45%',
+    right: '10%',
+    width: '25%',
+    height: '12%',
+    backgroundColor: '#c8e6c9',
+    borderRadius: 8,
+  },
+  
+  // Buildings - 3D Google Maps Style
+  buildingStockwell: {
+    position: 'absolute',
+    left: '15%',
+    top: '35%',
+    width: 120,
+  },
+  buildingQueenAnne: {
+    position: 'absolute',
+    left: '55%',
+    top: '40%',
+    width: 120,
+  },
+  buildingDreadnought: {
+    position: 'absolute',
+    left: '60%',
+    top: '15%',
+    width: 120,
+  },
+  buildingTop: {
     height: 100,
-    borderRadius: 12,
+    borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 8,
+  },
+  buildingLabel: {
+    backgroundColor: '#fff',
     padding: 8,
+    borderRadius: 8,
+    marginTop: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.2,
     shadowRadius: 4,
-    elevation: 5,
+    elevation: 4,
   },
-  buildingText: { fontSize: 11, fontWeight: '700', textAlign: 'center', marginTop: 4 },
-  pathway1: {
+  buildingLabelText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#202124',
+    textAlign: 'center',
+  },
+  buildingSubtext: {
+    fontSize: 11,
+    color: '#5f6368',
+    textAlign: 'center',
+    marginTop: 2,
+  },
+  
+  // River Label
+  riverLabel: {
     position: 'absolute',
-    left: '20%',
-    top: '30%',
-    width: '60%',
-    height: 3,
-    backgroundColor: '#d1d5db',
+    bottom: '10%',
+    alignSelf: 'center',
+    backgroundColor: 'rgba(255,255,255,0.9)',
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+    borderRadius: 12,
   },
-  pathway2: {
+  riverLabelText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#0288d1',
+  },
+  
+  // Compass
+  compass: {
     position: 'absolute',
-    left: '48%',
-    top: '20%',
-    width: 3,
-    height: '40%',
-    backgroundColor: '#d1d5db',
+    top: 20,
+    right: 20,
+    width: 50,
+    height: 50,
+    backgroundColor: '#fff',
+    borderRadius: 25,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
   },
-  mapLegend: {
+  compassText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#ea4335',
+    position: 'absolute',
+    top: 6,
+  },
+  
+  // Directions Card
+  directionsCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-    padding: 16,
+    gap: 16,
     backgroundColor: '#fff',
-    marginHorizontal: 20,
-    marginTop: 12,
+    margin: 20,
+    padding: 16,
     borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#e5e7eb',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  legendText: { fontSize: 14, fontWeight: '600', color: '#6b7280' },
-  mapInfo: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 20, backgroundColor: '#f8f9fb', borderTopWidth: 1, borderTopColor: '#e5e7eb' },
-  mapInfoText: { fontSize: 14, color: '#6b7280', flex: 1 },
+  directionsInfo: { flex: 1 },
+  directionsTitle: { fontSize: 15, fontWeight: '700', color: '#0D1140', marginBottom: 4 },
+  directionsText: { fontSize: 13, color: '#5f6368' },
+  
+  // Map Footer
+  mapFooter: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    gap: 12, 
+    padding: 16, 
+    backgroundColor: '#f8f9fa', 
+    borderTopWidth: 1, 
+    borderTopColor: '#e0e0e0',
+  },
+  mapFooterText: { fontSize: 13, color: '#5f6368', flex: 1 },
 });
