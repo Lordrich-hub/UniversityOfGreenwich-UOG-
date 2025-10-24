@@ -1,7 +1,8 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
-import { Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import MapView, { Marker } from 'react-native-maps';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type DaySchedule = {
@@ -16,6 +17,8 @@ type DaySchedule = {
   building: string;
   description: string;
   credits: number;
+  latitude: number;
+  longitude: number;
 };
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
@@ -23,26 +26,26 @@ const WEEKS = ['This Week', 'Next Week', 'Week After'];
 
 const SCHEDULE: { [key: string]: DaySchedule[] } = {
   Mon: [
-    { id: '1', time: '09:00 - 10:30', title: 'Advanced Algorithms', lecturer: 'Dr. Smith', room: 'CS Lab 3', building: 'Stockwell Street Building', type: 'lab', color: '#8b5cf6', emoji: '💻', description: 'Learn advanced algorithm design and analysis techniques', credits: 15 },
-    { id: '2', time: '11:00 - 12:30', title: 'Data Structures', lecturer: 'Prof. Johnson', room: 'Room 201', building: 'Queen Anne Building', type: 'lecture', color: '#3b82f6', emoji: '📚', description: 'Study fundamental data structures and their applications', credits: 15 },
-    { id: '3', time: '14:00 - 15:30', title: 'Web Development', lecturer: 'Dr. Chen', room: 'CS Lab 1', building: 'Stockwell Street Building', type: 'lab', color: '#10b981', emoji: '🌐', description: 'Build modern web applications with latest technologies', credits: 15 },
+    { id: '1', time: '09:00 - 10:30', title: 'Advanced Algorithms', lecturer: 'Dr. Smith', room: 'CS Lab 3', building: 'Stockwell Street Building', type: 'lab', color: '#8b5cf6', emoji: '💻', description: 'Learn advanced algorithm design and analysis techniques', credits: 15, latitude: 51.4834, longitude: -0.0067 },
+    { id: '2', time: '11:00 - 12:30', title: 'Data Structures', lecturer: 'Prof. Johnson', room: 'Room 201', building: 'Queen Anne Building', type: 'lecture', color: '#3b82f6', emoji: '📚', description: 'Study fundamental data structures and their applications', credits: 15, latitude: 51.4826, longitude: -0.0077 },
+    { id: '3', time: '14:00 - 15:30', title: 'Web Development', lecturer: 'Dr. Chen', room: 'CS Lab 1', building: 'Stockwell Street Building', type: 'lab', color: '#10b981', emoji: '🌐', description: 'Build modern web applications with latest technologies', credits: 15, latitude: 51.4834, longitude: -0.0067 },
   ],
   Tue: [
-    { id: '4', time: '10:00 - 11:30', title: 'Database Systems', lecturer: 'Dr. Williams', room: 'Room 305', building: 'Queen Anne Building', type: 'lecture', color: '#f59e0b', emoji: '🗄️', description: 'Database design, SQL, and management systems', credits: 15 },
-    { id: '5', time: '13:00 - 14:30', title: 'Software Engineering', lecturer: 'Prof. Davis', room: 'Room 102', building: 'Dreadnought Building', type: 'seminar', color: '#ec4899', emoji: '⚙️', description: 'Software development methodologies and practices', credits: 15 },
+    { id: '4', time: '10:00 - 11:30', title: 'Database Systems', lecturer: 'Dr. Williams', room: 'Room 305', building: 'Queen Anne Building', type: 'lecture', color: '#f59e0b', emoji: '🗄️', description: 'Database design, SQL, and management systems', credits: 15, latitude: 51.4826, longitude: -0.0077 },
+    { id: '5', time: '13:00 - 14:30', title: 'Software Engineering', lecturer: 'Prof. Davis', room: 'Room 102', building: 'Dreadnought Building', type: 'seminar', color: '#ec4899', emoji: '⚙️', description: 'Software development methodologies and practices', credits: 15, latitude: 51.4829, longitude: -0.0071 },
   ],
   Wed: [
-    { id: '6', time: '09:00 - 10:30', title: 'Machine Learning', lecturer: 'Dr. Martinez', room: 'CS Lab 2', building: 'Stockwell Street Building', type: 'lab', color: '#06b6d4', emoji: '🤖', description: 'Introduction to ML algorithms and neural networks', credits: 20 },
-    { id: '7', time: '11:00 - 12:00', title: 'Ethics in Tech', lecturer: 'Prof. Anderson', room: 'Lecture Hall A', building: 'Queen Anne Building', type: 'lecture', color: '#8b5cf6', emoji: '⚖️', description: 'Ethical considerations in technology and AI', credits: 10 },
-    { id: '8', time: '14:00 - 15:30', title: 'Tutorial Session', lecturer: 'TA: Sarah Lee', room: 'Room 201', building: 'Queen Anne Building', type: 'tutorial', color: '#f59e0b', emoji: '✏️', description: 'Weekly tutorial for assignment help', credits: 0 },
+    { id: '6', time: '09:00 - 10:30', title: 'Machine Learning', lecturer: 'Dr. Martinez', room: 'CS Lab 2', building: 'Stockwell Street Building', type: 'lab', color: '#06b6d4', emoji: '🤖', description: 'Introduction to ML algorithms and neural networks', credits: 20, latitude: 51.4834, longitude: -0.0067 },
+    { id: '7', time: '11:00 - 12:00', title: 'Ethics in Tech', lecturer: 'Prof. Anderson', room: 'Lecture Hall A', building: 'Queen Anne Building', type: 'lecture', color: '#8b5cf6', emoji: '⚖️', description: 'Ethical considerations in technology and AI', credits: 10, latitude: 51.4826, longitude: -0.0077 },
+    { id: '8', time: '14:00 - 15:30', title: 'Tutorial Session', lecturer: 'TA: Sarah Lee', room: 'Room 201', building: 'Queen Anne Building', type: 'tutorial', color: '#f59e0b', emoji: '✏️', description: 'Weekly tutorial for assignment help', credits: 0, latitude: 51.4826, longitude: -0.0077 },
   ],
   Thu: [
-    { id: '9', time: '10:00 - 11:30', title: 'Mobile App Dev', lecturer: 'Dr. Taylor', room: 'CS Lab 3', building: 'Stockwell Street Building', type: 'lab', color: '#10b981', emoji: '📱', description: 'Develop iOS and Android applications', credits: 15 },
-    { id: '10', time: '13:00 - 14:30', title: 'Computer Networks', lecturer: 'Prof. Brown', room: 'Room 204', building: 'Dreadnought Building', type: 'lecture', color: '#3b82f6', emoji: '🌐', description: 'Networking protocols and infrastructure', credits: 15 },
+    { id: '9', time: '10:00 - 11:30', title: 'Mobile App Dev', lecturer: 'Dr. Taylor', room: 'CS Lab 3', building: 'Stockwell Street Building', type: 'lab', color: '#10b981', emoji: '📱', description: 'Develop iOS and Android applications', credits: 15, latitude: 51.4834, longitude: -0.0067 },
+    { id: '10', time: '13:00 - 14:30', title: 'Computer Networks', lecturer: 'Prof. Brown', room: 'Room 204', building: 'Dreadnought Building', type: 'lecture', color: '#3b82f6', emoji: '🌐', description: 'Networking protocols and infrastructure', credits: 15, latitude: 51.4829, longitude: -0.0071 },
   ],
   Fri: [
-    { id: '11', time: '09:00 - 10:30', title: 'Cloud Computing', lecturer: 'Dr. Wilson', room: 'Room 301', building: 'Queen Anne Building', type: 'lecture', color: '#06b6d4', emoji: '☁️', description: 'Cloud platforms, services, and deployment', credits: 15 },
-    { id: '12', time: '11:00 - 12:30', title: 'Project Workshop', lecturer: 'All Staff', room: 'Innovation Lab', building: 'Stockwell Street Building', type: 'seminar', color: '#ec4899', emoji: '🚀', description: 'Collaborative project development session', credits: 0 },
+    { id: '11', time: '09:00 - 10:30', title: 'Cloud Computing', lecturer: 'Dr. Wilson', room: 'Room 301', building: 'Queen Anne Building', type: 'lecture', color: '#06b6d4', emoji: '☁️', description: 'Cloud platforms, services, and deployment', credits: 15, latitude: 51.4826, longitude: -0.0077 },
+    { id: '12', time: '11:00 - 12:30', title: 'Project Workshop', lecturer: 'All Staff', room: 'Innovation Lab', building: 'Stockwell Street Building', type: 'seminar', color: '#ec4899', emoji: '🚀', description: 'Collaborative project development session', credits: 0, latitude: 51.4834, longitude: -0.0067 },
   ],
 };
 
@@ -51,20 +54,26 @@ export default function Timetable() {
   const [selectedDay, setSelectedDay] = useState('Mon');
   const [selectedWeek, setSelectedWeek] = useState('This Week');
   const [showDetailModal, setShowDetailModal] = useState(false);
+  const [showMapModal, setShowMapModal] = useState(false);
   const [selectedClass, setSelectedClass] = useState<DaySchedule | null>(null);
-  const todayClasses = SCHEDULE[selectedDay] || [];
+  
+  // Get filtered schedule based on selected week
+  const getFilteredSchedule = () => {
+    // For demo purposes, just return the schedule
+    // In real app, you'd filter by actual dates
+    return SCHEDULE;
+  };
+  
+  const todayClasses = getFilteredSchedule()[selectedDay] || [];
 
   const handleClassPress = (classItem: DaySchedule) => {
     setSelectedClass(classItem);
     setShowDetailModal(true);
   };
 
-  const openMaps = (room: string, building: string) => {
-    // University of Greenwich coordinates
-    const coords = '51.4826,-0.0077';
-    const query = `University+of+Greenwich+${building.replace(/ /g, '+')}+${room.replace(/ /g, '+')}`;
-    const url = `https://www.google.com/maps/search/?api=1&query=${query}&center=${coords}`;
-    Linking.openURL(url);
+  const openMap = () => {
+    setShowDetailModal(false);
+    setTimeout(() => setShowMapModal(true), 300);
   };
 
   const getTypeIcon = (type: string) => {
@@ -263,13 +272,10 @@ export default function Timetable() {
 
                 <TouchableOpacity
                   style={[styles.mapButton, { backgroundColor: selectedClass.color }]}
-                  onPress={() => {
-                    setShowDetailModal(false);
-                    openMaps(selectedClass.room, selectedClass.building);
-                  }}
+                  onPress={openMap}
                 >
                   <MaterialIcons name="map" size={20} color="#fff" />
-                  <Text style={styles.mapButtonText}>Open in Maps</Text>
+                  <Text style={styles.mapButtonText}>View on Map</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -282,6 +288,62 @@ export default function Timetable() {
                   <MaterialIcons name="notifications" size={20} color="#0D1140" />
                   <Text style={styles.reminderButtonText}>Set Reminder</Text>
                 </TouchableOpacity>
+              </>
+            )}
+          </View>
+        </View>
+      </Modal>
+
+      {/* Map Modal */}
+      <Modal
+        visible={showMapModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowMapModal(false)}
+      >
+        <View style={styles.mapModalOverlay}>
+          <View style={styles.mapModalContent}>
+            {selectedClass && (
+              <>
+                <View style={styles.mapModalHeader}>
+                  <View>
+                    <Text style={styles.mapModalTitle}>{selectedClass.building}</Text>
+                    <Text style={styles.mapModalSubtitle}>{selectedClass.room}</Text>
+                  </View>
+                  <TouchableOpacity
+                    style={styles.mapCloseButton}
+                    onPress={() => setShowMapModal(false)}
+                  >
+                    <MaterialIcons name="close" size={24} color="#0D1140" />
+                  </TouchableOpacity>
+                </View>
+
+                <MapView
+                  style={styles.map}
+                  initialRegion={{
+                    latitude: selectedClass.latitude,
+                    longitude: selectedClass.longitude,
+                    latitudeDelta: 0.005,
+                    longitudeDelta: 0.005,
+                  }}
+                >
+                  <Marker
+                    coordinate={{
+                      latitude: selectedClass.latitude,
+                      longitude: selectedClass.longitude,
+                    }}
+                    title={selectedClass.building}
+                    description={selectedClass.room}
+                    pinColor={selectedClass.color}
+                  />
+                </MapView>
+
+                <View style={styles.mapInfo}>
+                  <MaterialIcons name="info-outline" size={20} color="#6b7280" />
+                  <Text style={styles.mapInfoText}>
+                    University of Greenwich, {selectedClass.building}
+                  </Text>
+                </View>
               </>
             )}
           </View>
@@ -360,4 +422,15 @@ const styles = StyleSheet.create({
   mapButtonText: { fontSize: 16, fontWeight: '700', color: '#fff' },
   reminderButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 16, borderRadius: 16, backgroundColor: '#f8f9fb' },
   reminderButtonText: { fontSize: 16, fontWeight: '700', color: '#0D1140' },
+
+  // Map Modal Styles
+  mapModalOverlay: { flex: 1, backgroundColor: 'rgba(13,17,64,0.7)' },
+  mapModalContent: { flex: 1, backgroundColor: '#fff', marginTop: 60 },
+  mapModalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#f0f0f0' },
+  mapModalTitle: { fontSize: 20, fontWeight: '800', color: '#0D1140' },
+  mapModalSubtitle: { fontSize: 14, color: '#6b7280', marginTop: 4 },
+  mapCloseButton: { padding: 8 },
+  map: { flex: 1 },
+  mapInfo: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 20, backgroundColor: '#f8f9fb', borderTopWidth: 1, borderTopColor: '#e5e7eb' },
+  mapInfoText: { fontSize: 14, color: '#6b7280', flex: 1 },
 });
