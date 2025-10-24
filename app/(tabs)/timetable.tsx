@@ -80,7 +80,7 @@ export default function Timetable() {
   return (
     <View style={[styles.page, { paddingTop: insets.top }]}>
       {/* Header */}
-      <LinearGradient colors={['#8b5cf6', '#ec4899']} style={styles.header}>
+      <LinearGradient colors={['#0D1140', '#1a1f5c']} style={styles.header}>
         <Text style={styles.headerTitle}>📅 My Schedule</Text>
         <Text style={styles.headerSubtitle}>stay on top of your game ✨</Text>
       </LinearGradient>

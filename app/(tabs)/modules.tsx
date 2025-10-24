@@ -55,7 +55,7 @@ export default function Modules() {
   return (
     <View style={[styles.page, { paddingTop: insets.top }]}>
       {/* Header */}
-      <LinearGradient colors={['#3b82f6', '#8b5cf6']} style={styles.header}>
+      <LinearGradient colors={['#0D1140', '#1a1f5c']} style={styles.header}>
         <Text style={styles.headerTitle}>📚 My Modules</Text>
         <Text style={styles.headerSubtitle}>crushing it one class at a time 💪</Text>
       </LinearGradient>

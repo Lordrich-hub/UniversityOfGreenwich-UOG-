@@ -1,7 +1,7 @@
-import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
-import { Alert, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type Category = {
@@ -112,7 +112,7 @@ export default function Explore() {
   return (
     <View style={[styles.page, { paddingTop: insets.top }]}>
       {/* Header */}
-      <LinearGradient colors={['#ec4899', '#8b5cf6']} style={styles.header}>
+      <LinearGradient colors={['#0D1140', '#1a1f5c']} style={styles.header}>
         <Text style={styles.headerTitle}>🌟 Explore</Text>
         <Text style={styles.headerSubtitle}>discover what's happening on campus</Text>
       </LinearGradient>
@@ -139,7 +139,7 @@ export default function Explore() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>🔥 trending now</Text>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => Alert.alert('Trending 🔥', 'Showing all trending items on campus!\n\n📚 Study Spaces\n🍕 Food Deals\n💼 Campus Jobs\n🎮 Gaming Tournaments\n🎨 Art Exhibitions')}>
               <Text style={styles.seeAllText}>see all</Text>
             </TouchableOpacity>
           </View>
@@ -231,7 +231,7 @@ export default function Explore() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>👥 student clubs</Text>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => Alert.alert('All Clubs 👥', 'Browse 50+ student clubs:\n\n💻 Tech Society\n🎭 Drama Club\n🎮 Gaming Guild\n🗣️ Debate Society\n📸 Photography Club\n💪 Fitness Crew\n🎵 Music Society\n♟️ Chess Club\n🌍 International Students\n...and many more!')}>
               <Text style={styles.seeAllText}>see all</Text>
             </TouchableOpacity>
           </View>
