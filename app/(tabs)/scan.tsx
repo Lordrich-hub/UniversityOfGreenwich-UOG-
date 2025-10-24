@@ -51,6 +51,9 @@ export default function Scan() {
         onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
       />
       <View style={[styles.overlay, { paddingTop: insets.top + 16 }]}>
+        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+          <MaterialIcons name="arrow-back" size={28} color="#fff" />
+        </TouchableOpacity>
         <Text style={styles.header}>Scan QR Code</Text>
         <Text style={styles.help}>Align the code within the frame</Text>
       </View>
@@ -68,7 +71,8 @@ const styles = StyleSheet.create({
   permissionButton: { backgroundColor: '#3b4a9e', paddingHorizontal: 32, paddingVertical: 16, borderRadius: 12 },
   permissionButtonText: { color: '#fff', fontSize: 16, fontWeight: '700' },
   overlay: { position: 'absolute', left: 0, right: 0, alignItems: 'center', backgroundColor: 'rgba(13,17,64,0.8)', paddingBottom: 16 },
-  header: { fontSize: 24, fontWeight: '800', color: '#fff', marginBottom: 8 },
+  backButton: { position: 'absolute', left: 16, top: 16, width: 44, height: 44, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(13,17,64,0.6)', borderRadius: 22 },
+  header: { fontSize: 24, fontWeight: '800', color: '#fff', marginBottom: 8, marginTop: 4 },
   help: { fontSize: 14, color: '#c8cfee' },
   scanFrame: {
     position: 'absolute',

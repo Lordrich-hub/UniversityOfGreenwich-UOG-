@@ -1,6 +1,7 @@
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
-import React from 'react';
+import React, { useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -16,34 +17,109 @@ interface MenuItem {
 export default function Profile() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [studentName, setStudentName] = useState('Lords Jackrich');
+  const [studentEmail, setStudentEmail] = useState('lj8607b@gre.ac.uk');
+  const [studentId, setStudentId] = useState('8607');
 
-  const menuSections: { id: string; items: MenuItem[] }[] = [
+  const pickImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission needed', 'Camera roll permissions are required to change your profile picture');
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+
+    if (!result.canceled) {
+      setProfileImage(result.assets[0].uri);
+    }
+  };
+
+  const takePhoto = async () => {
+    const { status} = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission needed', 'Camera permissions are required to take a photo');
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+
+    if (!result.canceled) {
+      setProfileImage(result.assets[0].uri);
+    }
+  };
+
+  const showImagePicker = () => {
+    Alert.alert(
+      'Change Profile Picture',
+      'Choose an option',
+      [
+        { text: 'Take Photo', onPress: takePhoto },
+        { text: 'Choose from Library', onPress: pickImage },
+        { text: 'Cancel', style: 'cancel' },
+      ]
+    );
+  };
+
+  const handleEditProfile = () => {
+    setIsEditingProfile(true);
+    Alert.alert('Edit Profile', 'You can now edit your name, email, and student ID', [
+      { text: 'OK' }
+    ]);
+  };
+
+  const handleSaveProfile = () => {
+    setIsEditingProfile(false);
+    Alert.alert('Profile Updated', 'Your profile has been saved successfully');
+  };
+
+  const menuSections: { id: string; title?: string; items: MenuItem[] }[] = [
     {
-      id: 'main',
+      id: 'academic',
+      title: 'Academic',
       items: [
-        { icon: 'account-circle', iconLib: 'MaterialCommunityIcons', label: 'My Profile', onPress: () => Alert.alert('My Profile', 'Profile details coming soon') },
-        { icon: 'wallet', iconLib: 'MaterialCommunityIcons', label: 'Wallet', badge: '', onPress: () => Alert.alert('Wallet', 'Wallet feature coming soon') },
-        { icon: 'bookmark', iconLib: 'MaterialIcons', label: 'Saved Messages', onPress: () => Alert.alert('Saved Messages', 'Saved messages coming soon') },
-        { icon: 'phone', iconLib: 'MaterialIcons', label: 'Recent Calls', onPress: () => Alert.alert('Recent Calls', 'Call history coming soon') },
-        { icon: 'devices', iconLib: 'MaterialIcons', label: 'Devices', badge: '5', onPress: () => Alert.alert('Devices', 'Device management coming soon') },
-        { icon: 'folder', iconLib: 'MaterialIcons', label: 'Chat Folders', onPress: () => Alert.alert('Chat Folders', 'Folder management coming soon') },
+        { icon: 'school', iconLib: 'MaterialIcons', label: 'Grades/GPA', onPress: () => Alert.alert('Grades/GPA', 'View your academic performance and GPA') },
+        { icon: 'event', iconLib: 'MaterialIcons', label: 'Timetable', onPress: () => router.push('/(tabs)/timetable') },
+        { icon: 'book', iconLib: 'MaterialIcons', label: 'Modules', onPress: () => router.push('/(tabs)/modules') },
+        { icon: 'assignment', iconLib: 'MaterialIcons', label: 'Assignments', onPress: () => Alert.alert('Assignments', 'View and manage your assignments') },
+      ],
+    },
+    {
+      id: 'services',
+      title: 'Services',
+      items: [
+        { icon: 'wallet', iconLib: 'MaterialCommunityIcons', label: 'Finance', onPress: () => Alert.alert('Finance', 'View tuition fees, payments, and financial aid') },
+        { icon: 'library-books', iconLib: 'MaterialIcons', label: 'Library', onPress: () => Alert.alert('Library', 'Access library resources and reservations') },
+        { icon: 'local-dining', iconLib: 'MaterialIcons', label: 'Meal Plan', onPress: () => Alert.alert('Meal Plan', 'Manage your campus meal plan') },
+        { icon: 'health-and-safety', iconLib: 'MaterialIcons', label: 'Health Services', onPress: () => Alert.alert('Health Services', 'Book health appointments and view records') },
       ],
     },
     {
       id: 'settings',
+      title: 'Settings',
       items: [
-        { icon: 'notifications', iconLib: 'MaterialIcons', label: 'Notifications and Sounds', onPress: () => Alert.alert('Notifications', 'Notification settings coming soon') },
-        { icon: 'security', iconLib: 'MaterialIcons', label: 'Privacy and Security', onPress: () => Alert.alert('Privacy', 'Privacy settings coming soon') },
-        { icon: 'storage', iconLib: 'MaterialIcons', label: 'Data and Storage', onPress: () => Alert.alert('Data', 'Storage settings coming soon') },
-        { icon: 'palette', iconLib: 'MaterialIcons', label: 'Appearance', onPress: () => Alert.alert('Appearance', 'Theme settings coming soon') },
-        { icon: 'language', iconLib: 'MaterialIcons', label: 'Language', subtitle: 'English', onPress: () => Alert.alert('Language', 'Language selection coming soon') },
+        { icon: 'notifications', iconLib: 'MaterialIcons', label: 'Notifications', onPress: () => Alert.alert('Notifications', 'Manage your notification preferences') },
+        { icon: 'security', iconLib: 'MaterialIcons', label: 'Privacy & Security', onPress: () => Alert.alert('Privacy', 'Manage your privacy and security settings') },
+        { icon: 'help', iconLib: 'MaterialIcons', label: 'Help & Support', onPress: () => Alert.alert('Help', 'Get help and contact support') },
+        { icon: 'logout', iconLib: 'MaterialIcons', label: 'Sign Out', onPress: () => Alert.alert('Sign Out', 'Are you sure you want to sign out?', [{ text: 'Cancel' }, { text: 'Sign Out', style: 'destructive' }]) },
       ],
     },
   ];
 
   return (
     <View style={styles.page}>
-      {/* Header with back button */}
+      {/* Header with back button - stays dark navy */}
       <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
         <TouchableOpacity 
           style={styles.backButton} 
@@ -55,49 +131,102 @@ export default function Profile() {
       </View>
 
       <ScrollView style={styles.scrollView} contentContainerStyle={{ paddingBottom: insets.bottom + 100 }}>
-        {/* Profile Header */}
-        <TouchableOpacity style={styles.profileHeader} onPress={() => Alert.alert('Edit Profile', 'Profile editing coming soon')}>
-          <View style={styles.avatarLarge}>
-            <Text style={styles.avatarLargeText}>L</Text>
-          </View>
-          <Text style={styles.profileName}>Student Name</Text>
-          <Text style={styles.profilePhone}>+234 81 2659 3349 • @student_uog</Text>
-        </TouchableOpacity>
+        {/* Profile Header - white background */}
+        <View style={styles.whiteSection}>
+          <TouchableOpacity style={styles.profileHeader} onPress={showImagePicker}>
+            <View style={styles.avatarContainer}>
+              {profileImage ? (
+                <Image source={{ uri: profileImage }} style={styles.avatarImage} />
+              ) : (
+                <View style={styles.avatarLarge}>
+                  <Text style={styles.avatarLargeText}>
+                    {studentName.split(' ').map(n => n[0]).join('')}
+                  </Text>
+                </View>
+              )}
+              <View style={styles.cameraIcon}>
+                <MaterialIcons name="camera-alt" size={18} color="#fff" />
+              </View>
+            </View>
+          </TouchableOpacity>
 
-        {/* Menu Sections */}
-        {menuSections.map((section) => (
-          <View key={section.id} style={styles.menuSection}>
-            {section.items.map((item, index) => (
-              <TouchableOpacity
-                key={index}
-                style={[
-                  styles.menuItem,
-                  index === 0 && styles.menuItemFirst,
-                  index === section.items.length - 1 && styles.menuItemLast,
-                ]}
-                onPress={item.onPress}
-              >
-                <View style={styles.menuItemLeft}>
-                  <View style={styles.iconContainer}>
-                    {item.iconLib === 'MaterialIcons' ? (
-                      <MaterialIcons name={item.icon as any} size={24} color="#fff" />
-                    ) : (
-                      <MaterialCommunityIcons name={item.icon as any} size={24} color="#fff" />
-                    )}
-                  </View>
-                  <View style={styles.menuItemTextContainer}>
-                    <Text style={styles.menuItemLabel}>{item.label}</Text>
-                    {item.subtitle && <Text style={styles.menuItemSubtitle}>{item.subtitle}</Text>}
-                  </View>
-                </View>
-                <View style={styles.menuItemRight}>
-                  {item.badge && <Text style={styles.badge}>{item.badge}</Text>}
-                  <MaterialIcons name="chevron-right" size={24} color="#8891b8" />
-                </View>
-              </TouchableOpacity>
-            ))}
+          <View style={styles.profileInfo}>
+            {isEditingProfile ? (
+              <>
+                <TextInput
+                  style={styles.nameInput}
+                  value={studentName}
+                  onChangeText={setStudentName}
+                  placeholder="Full Name"
+                  placeholderTextColor="#9aa0c7"
+                />
+                <TextInput
+                  style={styles.emailInput}
+                  value={studentEmail}
+                  onChangeText={setStudentEmail}
+                  placeholder="Email"
+                  keyboardType="email-address"
+                  placeholderTextColor="#9aa0c7"
+                />
+                <TextInput
+                  style={styles.emailInput}
+                  value={studentId}
+                  onChangeText={setStudentId}
+                  placeholder="Student ID"
+                  placeholderTextColor="#9aa0c7"
+                />
+                <TouchableOpacity style={styles.saveButton} onPress={handleSaveProfile}>
+                  <Text style={styles.saveButtonText}>Save Changes</Text>
+                </TouchableOpacity>
+              </>
+            ) : (
+              <>
+                <Text style={styles.profileName}>{studentName}</Text>
+                <Text style={styles.profileEmail}>{studentEmail}</Text>
+                <Text style={styles.profileId}>Student ID: {studentId}</Text>
+                <TouchableOpacity style={styles.editButton} onPress={handleEditProfile}>
+                  <MaterialIcons name="edit" size={16} color="#0D1140" />
+                  <Text style={styles.editButtonText}>Edit Profile</Text>
+                </TouchableOpacity>
+              </>
+            )}
           </View>
-        ))}
+
+          {/* Menu Sections */}
+          {menuSections.map((section) => (
+            <View key={section.id} style={styles.menuSectionWhite}>
+              {section.title && <Text style={styles.sectionTitle}>{section.title}</Text>}
+              {section.items.map((item, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={[
+                    styles.menuItemWhite,
+                    index === section.items.length - 1 && styles.menuItemLastWhite,
+                  ]}
+                  onPress={item.onPress}
+                >
+                  <View style={styles.menuItemLeft}>
+                    <View style={styles.iconContainerWhite}>
+                      {item.iconLib === 'MaterialIcons' ? (
+                        <MaterialIcons name={item.icon as any} size={22} color="#0D1140" />
+                      ) : (
+                        <MaterialCommunityIcons name={item.icon as any} size={22} color="#0D1140" />
+                      )}
+                    </View>
+                    <View style={styles.menuItemTextContainer}>
+                      <Text style={styles.menuItemLabelWhite}>{item.label}</Text>
+                      {item.subtitle && <Text style={styles.menuItemSubtitleWhite}>{item.subtitle}</Text>}
+                    </View>
+                  </View>
+                  <View style={styles.menuItemRight}>
+                    {item.badge && <Text style={styles.badgeWhite}>{item.badge}</Text>}
+                    <MaterialIcons name="chevron-right" size={24} color="#9aa0c7" />
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </View>
+          ))}
+        </View>
       </ScrollView>
     </View>
   );
@@ -109,20 +238,35 @@ const styles = StyleSheet.create({
   backButton: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', marginRight: 8 },
   headerTitle: { fontSize: 20, fontWeight: '700', color: '#fff' },
   scrollView: { flex: 1 },
-  profileHeader: { alignItems: 'center', paddingVertical: 32, paddingHorizontal: 24 },
-  avatarLarge: { width: 100, height: 100, borderRadius: 50, backgroundColor: '#3b4a9e', alignItems: 'center', justifyContent: 'center', marginBottom: 16 },
-  avatarLargeText: { color: '#fff', fontSize: 40, fontWeight: '700' },
-  profileName: { fontSize: 26, fontWeight: '700', color: '#fff', marginBottom: 8 },
-  profilePhone: { fontSize: 15, color: '#9aa0c7' },
-  menuSection: { backgroundColor: '#151a42', marginHorizontal: 16, marginBottom: 16, borderRadius: 16, overflow: 'hidden' },
-  menuItem: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 14, paddingHorizontal: 16, backgroundColor: '#151a42', borderBottomWidth: 0.5, borderBottomColor: 'rgba(255,255,255,0.08)' },
-  menuItemFirst: { borderTopLeftRadius: 16, borderTopRightRadius: 16 },
-  menuItemLast: { borderBottomWidth: 0, borderBottomLeftRadius: 16, borderBottomRightRadius: 16 },
+  // White section starts here
+  whiteSection: { backgroundColor: '#fff', flex: 1, marginTop: 0, paddingTop: 32 },
+  profileHeader: { alignItems: 'center', marginBottom: 24 },
+  avatarContainer: { position: 'relative', marginBottom: 16 },
+  avatarLarge: { width: 100, height: 100, borderRadius: 50, backgroundColor: '#3b4a9e', alignItems: 'center', justifyContent: 'center' },
+  avatarImage: { width: 100, height: 100, borderRadius: 50 },
+  avatarLargeText: { color: '#fff', fontSize: 36, fontWeight: '700' },
+  cameraIcon: { position: 'absolute', bottom: 0, right: 0, width: 32, height: 32, borderRadius: 16, backgroundColor: '#3b4a9e', alignItems: 'center', justifyContent: 'center', borderWidth: 3, borderColor: '#fff' },
+  profileInfo: { alignItems: 'center', paddingHorizontal: 24, marginBottom: 32 },
+  profileName: { fontSize: 26, fontWeight: '700', color: '#0D1140', marginBottom: 8 },
+  profileEmail: { fontSize: 15, color: '#6b7280', marginBottom: 4 },
+  profileId: { fontSize: 14, color: '#9aa0c7', marginBottom: 16 },
+  editButton: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#f0f2f5', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20 },
+  editButtonText: { fontSize: 14, fontWeight: '600', color: '#0D1140', marginLeft: 6 },
+  // Edit mode inputs
+  nameInput: { fontSize: 26, fontWeight: '700', color: '#0D1140', marginBottom: 8, borderBottomWidth: 1, borderBottomColor: '#e0e0e0', width: '100%', textAlign: 'center', paddingVertical: 8 },
+  emailInput: { fontSize: 15, color: '#6b7280', marginBottom: 8, borderBottomWidth: 1, borderBottomColor: '#e0e0e0', width: '100%', textAlign: 'center', paddingVertical: 8 },
+  saveButton: { backgroundColor: '#3b4a9e', paddingHorizontal: 24, paddingVertical: 12, borderRadius: 20, marginTop: 16 },
+  saveButtonText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  // Menu sections on white background
+  menuSectionWhite: { paddingHorizontal: 16, marginBottom: 24 },
+  sectionTitle: { fontSize: 14, fontWeight: '700', color: '#9aa0c7', marginBottom: 12, marginLeft: 4, textTransform: 'uppercase', letterSpacing: 0.5 },
+  menuItemWhite: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 14, paddingHorizontal: 16, backgroundColor: '#f8f9fb', borderBottomWidth: 0.5, borderBottomColor: '#e0e0e0' },
+  menuItemLastWhite: { borderBottomWidth: 0, borderBottomLeftRadius: 12, borderBottomRightRadius: 12 },
   menuItemLeft: { flexDirection: 'row', alignItems: 'center', flex: 1 },
-  iconContainer: { width: 40, height: 40, borderRadius: 8, backgroundColor: '#3b4a9e', alignItems: 'center', justifyContent: 'center', marginRight: 12 },
+  iconContainerWhite: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#e8eaf0', alignItems: 'center', justifyContent: 'center', marginRight: 12 },
   menuItemTextContainer: { flex: 1 },
-  menuItemLabel: { fontSize: 16, fontWeight: '600', color: '#fff', marginBottom: 2 },
-  menuItemSubtitle: { fontSize: 13, color: '#8891b8' },
+  menuItemLabelWhite: { fontSize: 16, fontWeight: '600', color: '#0D1140', marginBottom: 2 },
+  menuItemSubtitleWhite: { fontSize: 13, color: '#6b7280' },
   menuItemRight: { flexDirection: 'row', alignItems: 'center' },
-  badge: { backgroundColor: '#8891b8', color: '#fff', fontSize: 13, fontWeight: '600', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 12, marginRight: 8, minWidth: 24, textAlign: 'center' },
+  badgeWhite: { backgroundColor: '#e8eaf0', color: '#0D1140', fontSize: 13, fontWeight: '600', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 12, marginRight: 8, minWidth: 24, textAlign: 'center' },
 });
