@@ -110,14 +110,18 @@ export default function Explore() {
     : EVENTS.filter(e => e.category === selectedCategory);
 
   return (
-    <View style={[styles.page, { paddingTop: insets.top }]}>
-      {/* Header */}
-      <LinearGradient colors={['#0D1140', '#1a1f5c']} style={styles.header}>
-        <Text style={styles.headerTitle}>🌟 Explore</Text>
-        <Text style={styles.headerSubtitle}>discover what's happening on campus</Text>
-      </LinearGradient>
+    <View style={styles.page}>
+      {/* Header with dark blue background that extends to top */}
+      <View style={[styles.headerContainer, { paddingTop: insets.top }]}>
+        <LinearGradient colors={['#0D1140', '#1a1f5c']} style={styles.header}>
+          <Text style={styles.headerTitle}>🌟 Explore</Text>
+          <Text style={styles.headerSubtitle}>discover what's happening on campus</Text>
+        </LinearGradient>
+      </View>
 
-      <ScrollView style={styles.content} contentContainerStyle={{ paddingBottom: insets.bottom + 20 }}>
+      {/* White Content Area */}
+      <View style={styles.content}>
+      <ScrollView style={styles.scrollContent} contentContainerStyle={{ paddingBottom: insets.bottom + 20 }}>
         {/* Search Bar */}
         <View style={styles.searchContainer}>
           <MaterialIcons name="search" size={20} color="#6b7280" />
@@ -255,17 +259,20 @@ export default function Explore() {
           </View>
         </View>
       </ScrollView>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  page: { flex: 1, backgroundColor: '#fff' },
-  header: { paddingVertical: 24, paddingHorizontal: 20, borderBottomLeftRadius: 24, borderBottomRightRadius: 24 },
+  page: { flex: 1, backgroundColor: '#0D1140' },
+  headerContainer: { backgroundColor: '#0D1140' },
+  header: { paddingVertical: 24, paddingHorizontal: 20 },
   headerTitle: { fontSize: 28, fontWeight: '800', color: '#fff', marginBottom: 4 },
   headerSubtitle: { fontSize: 14, color: '#fff', opacity: 0.9 },
 
-  content: { flex: 1 },
+  content: { flex: 1, backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, marginTop: -24 },
+  scrollContent: { flex: 1 },
   
   searchContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#f8f9fb', marginHorizontal: 16, marginTop: 16, marginBottom: 8, paddingHorizontal: 16, paddingVertical: 12, borderRadius: 16, gap: 8 },
   searchInput: { flex: 1, fontSize: 15, color: '#0D1140' },

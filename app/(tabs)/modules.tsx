@@ -53,12 +53,17 @@ export default function Modules() {
   const avgProgress = MODULES.reduce((sum, m) => sum + m.progress, 0) / MODULES.length;
 
   return (
-    <View style={[styles.page, { paddingTop: insets.top }]}>
-      {/* Header */}
-      <LinearGradient colors={['#0D1140', '#1a1f5c']} style={styles.header}>
-        <Text style={styles.headerTitle}>📚 My Modules</Text>
-        <Text style={styles.headerSubtitle}>crushing it one class at a time 💪</Text>
-      </LinearGradient>
+    <View style={styles.page}>
+      {/* Header with dark blue background that extends to top */}
+      <View style={[styles.headerContainer, { paddingTop: insets.top }]}>
+        <LinearGradient colors={['#0D1140', '#1a1f5c']} style={styles.header}>
+          <Text style={styles.headerTitle}>📚 My Modules</Text>
+          <Text style={styles.headerSubtitle}>crushing it one class at a time 💪</Text>
+        </LinearGradient>
+      </View>
+
+      {/* White Content Area */}
+      <View style={styles.content}>
 
       {/* Stats */}
       <View style={styles.statsRow}>
@@ -140,7 +145,8 @@ export default function Modules() {
             </TouchableOpacity>
           );
         })}
-      </ScrollView>
+        </ScrollView>
+      </View>
 
       {/* Detail Modal */}
       <Modal
@@ -226,16 +232,19 @@ export default function Modules() {
     </View>
   );
 }
-
 const styles = StyleSheet.create({
-  page: { flex: 1, backgroundColor: '#fff' },
-  header: { paddingVertical: 24, paddingHorizontal: 20, borderBottomLeftRadius: 24, borderBottomRightRadius: 24 },
+  page: { flex: 1, backgroundColor: '#0D1140' },
+  headerContainer: { backgroundColor: '#0D1140' },
+  header: { paddingVertical: 24, paddingHorizontal: 20 },
   headerTitle: { fontSize: 28, fontWeight: '800', color: '#fff', marginBottom: 4 },
   headerSubtitle: { fontSize: 14, color: '#fff', opacity: 0.9 },
 
-  statsRow: { flexDirection: 'row', paddingHorizontal: 16, paddingVertical: 16, gap: 12 },
+  content: { flex: 1, backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, marginTop: -24 },
+
+  statsRow: { flexDirection: 'row', paddingHorizontal: 16, paddingTop: 24, paddingBottom: 8, gap: 12 },
   statBox: { flex: 1, backgroundColor: '#f8f9fb', borderRadius: 16, padding: 16, alignItems: 'center' },
   statNumber: { fontSize: 24, fontWeight: '800', color: '#0D1140', marginBottom: 4 },
+  statLabel: { fontSize: 11, color: '#6b7280' }, color: '#0D1140', marginBottom: 4 },
   statLabel: { fontSize: 11, color: '#6b7280' },
 
   modulesList: { flex: 1, paddingHorizontal: 16 },
