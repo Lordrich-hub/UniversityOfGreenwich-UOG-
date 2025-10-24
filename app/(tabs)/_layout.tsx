@@ -64,12 +64,8 @@ export default function TabsLayout() {
           <MaterialIcons name="explore" size={focused ? 30 : 24} color={color} />
         ),
       }} />
-      <Tabs.Screen name="scan" options={{
-        title: 'Scan',
-        tabBarIcon: ({ color, focused }) => (
-          <MaterialIcons name="qr-code-scanner" size={focused ? 30 : 24} color={color} />
-        ),
-      }} />
+      {/* Hide scan from tab bar - accessible via scanner button on home */}
+      <Tabs.Screen name="scan" options={{ href: null }} />
     </Tabs>
   );
 }
