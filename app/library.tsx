@@ -9,72 +9,76 @@ export default function Library() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchModalVisible, setSearchModalVisible] = useState(false);
-  const [studyRoomModalVisible, setStudyRoomModalVisible] = useState(false);
-
-  const borrowedBooks = [
+  const [showSearchModal, setShowSearchModal] = useState(false);
+  const [showStudyRoomModal, setShowStudyRoomModal] = useState(false);
+  const [borrowedBooks, setBorrowedBooks] = useState([
     { id: '1', title: 'Data Structures and Algorithms', author: 'Thomas Cormen', dueDate: 'Jan 20, 2025', status: 'active', color: '#10b981' },
     { id: '2', title: 'Clean Code', author: 'Robert Martin', dueDate: 'Jan 18, 2025', status: 'due-soon', color: '#f59e0b' },
     { id: '3', title: 'The Pragmatic Programmer', author: 'Hunt & Thomas', dueDate: 'Jan 25, 2025', status: 'active', color: '#3b82f6' },
-  ];
+  ]);
 
   const reservedBooks = [
     { id: '1', title: 'Design Patterns', author: 'Gang of Four', available: 'Jan 15, 2025' },
     { id: '2', title: 'Introduction to Algorithms', author: 'CLRS', available: 'Jan 22, 2025' },
   ];
 
-  const handleRenewBook = (bookTitle: string, dueDate: string) => {
-    const newDate = new Date(dueDate);
-    newDate.setDate(newDate.getDate() + 14); // Add 14 days
+  const quickLinks = [
+    { icon: 'search', label: 'Search Catalog', color: '#3b82f6' },
+    { icon: 'book', label: 'Study Rooms', color: '#8b5cf6' },
+    { icon: 'laptop', label: 'E-Resources', color: '#10b981' },
+    { icon: 'help-outline', label: 'Ask Librarian', color: '#ec4899' },
+  ];
+
+  const handleRenewBook = (bookId: string, bookTitle: string) => {
     Alert.alert(
-      'Book Renewed',
-      `"${bookTitle}" has been renewed successfully!\n\nNew due date: ${newDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`,
-      [{ text: 'OK' }]
-    );
-  };
-
-  const handleSearchCatalog = () => {
-    setSearchModalVisible(true);
-  };
-
-  const handleStudyRooms = () => {
-    setStudyRoomModalVisible(true);
-  };
-
-  const handleEResources = () => {
-    Alert.alert(
-      'E-Resources',
-      'Access thousands of online journals, databases, and e-books:\n\n• JSTOR\n• IEEE Xplore\n• SpringerLink\n• ProQuest\n• Wiley Online Library',
-      [{ text: 'OK' }]
-    );
-  };
-
-  const handleAskLibrarian = () => {
-    Alert.alert(
-      'Ask a Librarian',
-      'Get help from our librarians:\n\n📧 Email: library@gre.ac.uk\n💬 Live Chat: Available 9am-5pm\n📞 Phone: +44 20 8331 9000',
+      'Renew Book',
+      `Renew "${bookTitle}" for 14 more days?`,
       [
-        { text: 'Send Email', onPress: () => alert('Opening email...') },
-        { text: 'Close' }
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Renew',
+          onPress: () => {
+            setBorrowedBooks(prev =>
+              prev.map(book => {
+                if (book.id === bookId) {
+                  const newDate = new Date();
+                  newDate.setDate(newDate.getDate() + 14);
+                  return { ...book, dueDate: newDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }), status: 'active', color: '#10b981' };
+                }
+                return book;
+              })
+            );
+            Alert.alert('Success', `"${bookTitle}" has been renewed for 14 days!`);
+          },
+        },
       ]
     );
   };
 
-  const performSearch = () => {
-    if (!searchQuery.trim()) {
-      Alert.alert('Search', 'Please enter a search term');
-      return;
+  const handleQuickLink = (label: string) => {
+    switch (label) {
+      case 'Search Catalog':
+        setShowSearchModal(true);
+        break;
+      case 'Study Rooms':
+        setShowStudyRoomModal(true);
+        break;
+      case 'E-Resources':
+        Alert.alert(
+          'E-Resources',
+          'Available Resources:\n\n📚 JSTOR\n📚 IEEE Xplore\n📚 SpringerLink\n📚 ScienceDirect\n📚 ProQuest\n\nAccess all resources through your student portal.',
+          [{ text: 'OK' }]
+        );
+        break;
+      case 'Ask Librarian':
+        Alert.alert(
+          'Ask a Librarian',
+          'Get help from our librarians:\n\n📧 Email: library@gre.ac.uk\n📞 Phone: +44 20 8331 9000\n💬 Live Chat: Available Mon-Fri 9am-5pm\n\nWe typically respond within 24 hours.',
+          [{ text: 'OK' }]
+        );
+        break;
     }
-    setSearchModalVisible(false);
-    Alert.alert('Search Results', `Searching for "${searchQuery}"...\n\nFound 15 results in the catalog. This feature will show detailed results in a future update.`);
   };
-
-  const quickLinks = [
-    { icon: 'search', label: 'Search Catalog', color: '#3b82f6', onPress: handleSearchCatalog },
-    { icon: 'book', label: 'Study Rooms', color: '#8b5cf6', onPress: handleStudyRooms },
-    { icon: 'laptop', label: 'E-Resources', color: '#10b981', onPress: handleEResources },
-    { icon: 'help-outline', label: 'Ask Librarian', color: '#ec4899', onPress: handleAskLibrarian },
-  ];
 
   return (
     <View style={styles.page}>
@@ -111,7 +115,7 @@ export default function Library() {
               <TouchableOpacity
                 key={index}
                 style={styles.quickLinkCard}
-                onPress={link.onPress}
+                onPress={() => handleQuickLink(link.label)}
               >
                 <View style={[styles.quickLinkIcon, { backgroundColor: link.color + '15' }]}>
                   <MaterialIcons name={link.icon as any} size={26} color={link.color} />
@@ -132,7 +136,7 @@ export default function Library() {
             <TouchableOpacity
               key={book.id}
               style={styles.bookCard}
-              onPress={() => handleRenewBook(book.title, book.dueDate)}
+              onPress={() => alert(`Renew "${book.title}"?`)}
             >
               <View style={[styles.bookColorStrip, { backgroundColor: book.color }]} />
               <View style={styles.bookContent}>
@@ -151,10 +155,7 @@ export default function Library() {
                 </View>
                 <TouchableOpacity
                   style={[styles.renewButton, { backgroundColor: book.color + '15' }]}
-                  onPress={(e) => {
-                    e.stopPropagation();
-                    handleRenewBook(book.title, book.dueDate);
-                  }}
+                  onPress={() => handleRenewBook(book.id, book.title)}
                 >
                   <MaterialIcons name="refresh" size={20} color={book.color} />
                 </TouchableOpacity>
@@ -210,70 +211,102 @@ export default function Library() {
         </View>
       </ScrollView>
 
-      {/* Search Modal */}
-      <Modal visible={searchModalVisible} transparent animationType="slide">
+      {/* Search Catalog Modal */}
+      <Modal
+        visible={showSearchModal}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowSearchModal(false)}
+      >
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
+          <View style={[styles.modalContent, { paddingBottom: insets.bottom + 20 }]}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Search Catalog</Text>
-              <TouchableOpacity onPress={() => setSearchModalVisible(false)}>
+              <TouchableOpacity onPress={() => setShowSearchModal(false)}>
                 <MaterialIcons name="close" size={24} color="#0D1140" />
               </TouchableOpacity>
             </View>
+
             <View style={styles.modalBody}>
               <TextInput
                 style={styles.searchModalInput}
-                placeholder="Enter book title, author, or ISBN..."
+                placeholder="Search for books, journals, articles..."
                 placeholderTextColor="#9aa0c7"
-                value={searchQuery}
-                onChangeText={setSearchQuery}
                 autoFocus
               />
-              <TouchableOpacity style={styles.searchButton} onPress={performSearch}>
-                <MaterialIcons name="search" size={20} color="#fff" style={{ marginRight: 8 }} />
-                <Text style={styles.searchButtonText}>Search</Text>
-              </TouchableOpacity>
+
+              <Text style={styles.popularTitle}>Popular Searches</Text>
+              {['Computer Science', 'Engineering', 'Business Studies', 'Mathematics', 'Psychology'].map((term, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={styles.popularItem}
+                  onPress={() => {
+                    setShowSearchModal(false);
+                    Alert.alert('Search Results', `Showing results for "${term}"`);
+                  }}
+                >
+                  <MaterialIcons name="search" size={20} color="#9aa0c7" />
+                  <Text style={styles.popularText}>{term}</Text>
+                </TouchableOpacity>
+              ))}
             </View>
           </View>
         </View>
       </Modal>
 
       {/* Study Room Modal */}
-      <Modal visible={studyRoomModalVisible} transparent animationType="slide">
+      <Modal
+        visible={showStudyRoomModal}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowStudyRoomModal(false)}
+      >
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
+          <View style={[styles.modalContent, { paddingBottom: insets.bottom + 20 }]}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Book Study Room</Text>
-              <TouchableOpacity onPress={() => setStudyRoomModalVisible(false)}>
+              <TouchableOpacity onPress={() => setShowStudyRoomModal(false)}>
                 <MaterialIcons name="close" size={24} color="#0D1140" />
               </TouchableOpacity>
             </View>
+
             <ScrollView style={styles.modalBody}>
-              <View style={styles.roomCard}>
-                <Text style={styles.roomName}>Room 101 - Small (4 people)</Text>
-                <Text style={styles.roomStatus}>✅ Available</Text>
-                <TouchableOpacity style={styles.bookRoomButton} onPress={() => {
-                  setStudyRoomModalVisible(false);
-                  Alert.alert('Room Booked', 'Study Room 101 has been reserved for you today 2:00 PM - 4:00 PM');
-                }}>
-                  <Text style={styles.bookRoomText}>Book Now</Text>
+              <Text style={styles.roomsTitle}>Available Study Rooms</Text>
+              {[
+                { name: 'Study Room A', capacity: '4 people', status: 'Available', color: '#10b981' },
+                { name: 'Study Room B', capacity: '6 people', status: 'Available', color: '#10b981' },
+                { name: 'Study Room C', capacity: '8 people', status: 'Occupied', color: '#ef4444' },
+                { name: 'Study Room D', capacity: '4 people', status: 'Available', color: '#10b981' },
+              ].map((room, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={styles.roomCard}
+                  onPress={() => {
+                    if (room.status === 'Available') {
+                      setShowStudyRoomModal(false);
+                      Alert.alert('Book Room', `Book ${room.name}?`, [
+                        { text: 'Cancel', style: 'cancel' },
+                        {
+                          text: 'Book',
+                          onPress: () => Alert.alert('Success', `${room.name} booked for 2 hours!`),
+                        },
+                      ]);
+                    }
+                  }}
+                  disabled={room.status === 'Occupied'}
+                >
+                  <View style={styles.roomInfo}>
+                    <Text style={styles.roomName}>{room.name}</Text>
+                    <Text style={styles.roomCapacity}>{room.capacity}</Text>
+                  </View>
+                  <View style={[styles.roomStatus, { backgroundColor: room.color + '15' }]}>
+                    <View style={[styles.roomStatusDot, { backgroundColor: room.color }]} />
+                    <Text style={[styles.roomStatusText, { color: room.color }]}>
+                      {room.status}
+                    </Text>
+                  </View>
                 </TouchableOpacity>
-              </View>
-              <View style={styles.roomCard}>
-                <Text style={styles.roomName}>Room 202 - Medium (8 people)</Text>
-                <Text style={styles.roomStatus}>✅ Available</Text>
-                <TouchableOpacity style={styles.bookRoomButton} onPress={() => {
-                  setStudyRoomModalVisible(false);
-                  Alert.alert('Room Booked', 'Study Room 202 has been reserved for you today 3:00 PM - 5:00 PM');
-                }}>
-                  <Text style={styles.bookRoomText}>Book Now</Text>
-                </TouchableOpacity>
-              </View>
-              <View style={styles.roomCard}>
-                <Text style={styles.roomName}>Room 303 - Large (12 people)</Text>
-                <Text style={[styles.roomStatus, { color: '#ef4444' }]}>❌ Occupied</Text>
-                <Text style={styles.roomNote}>Next available: 6:00 PM</Text>
-              </View>
+              ))}
             </ScrollView>
           </View>
         </View>
@@ -336,18 +369,21 @@ const styles = StyleSheet.create({
   hoursTime: { fontSize: 15, color: '#0D1140', fontWeight: '600' },
 
   // Modals
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
-  modalContent: { backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, maxHeight: '70%' },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(13,17,64,0.5)', justifyContent: 'flex-end' },
+  modalContent: { backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, maxHeight: '80%' },
   modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, borderBottomWidth: 1, borderBottomColor: '#e8eaf0' },
   modalTitle: { fontSize: 20, fontWeight: '700', color: '#0D1140' },
   modalBody: { padding: 20 },
-  searchModalInput: { backgroundColor: '#f8f9fb', borderRadius: 12, padding: 16, fontSize: 16, color: '#0D1140', marginBottom: 16 },
-  searchButton: { backgroundColor: '#3b82f6', borderRadius: 12, paddingVertical: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
-  searchButtonText: { fontSize: 16, fontWeight: '600', color: '#fff' },
-  roomCard: { backgroundColor: '#f8f9fb', borderRadius: 12, padding: 16, marginBottom: 12 },
-  roomName: { fontSize: 16, fontWeight: '700', color: '#0D1140', marginBottom: 8 },
-  roomStatus: { fontSize: 14, color: '#10b981', marginBottom: 12, fontWeight: '600' },
-  roomNote: { fontSize: 13, color: '#9aa0c7', marginTop: 8 },
-  bookRoomButton: { backgroundColor: '#8b5cf6', borderRadius: 10, paddingVertical: 10, alignItems: 'center' },
-  bookRoomText: { fontSize: 14, fontWeight: '600', color: '#fff' },
+  searchModalInput: { backgroundColor: '#f8f9fb', borderRadius: 12, padding: 16, fontSize: 16, color: '#0D1140', marginBottom: 24 },
+  popularTitle: { fontSize: 16, fontWeight: '700', color: '#0D1140', marginBottom: 12 },
+  popularItem: { flexDirection: 'row', alignItems: 'center', padding: 16, backgroundColor: '#f8f9fb', borderRadius: 12, marginBottom: 10, gap: 12 },
+  popularText: { fontSize: 15, color: '#0D1140', fontWeight: '500' },
+  roomsTitle: { fontSize: 16, fontWeight: '700', color: '#0D1140', marginBottom: 16 },
+  roomCard: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#f8f9fb', borderRadius: 16, padding: 18, marginBottom: 12 },
+  roomInfo: { flex: 1 },
+  roomName: { fontSize: 16, fontWeight: '700', color: '#0D1140', marginBottom: 6 },
+  roomCapacity: { fontSize: 14, color: '#9aa0c7' },
+  roomStatus: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 10, gap: 6 },
+  roomStatusDot: { width: 6, height: 6, borderRadius: 3 },
+  roomStatusText: { fontSize: 13, fontWeight: '600' },
 });

@@ -2,16 +2,17 @@ import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Alert, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function Finance() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const [paymentModalVisible, setPaymentModalVisible] = useState(false);
-  const [statementModalVisible, setStatementModalVisible] = useState(false);
-  const [aidModalVisible, setAidModalVisible] = useState(false);
+
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [showStatementModal, setShowStatementModal] = useState(false);
   const [paymentAmount, setPaymentAmount] = useState('');
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('card');
 
   const accountBalance = 2450.00;
   const tuitionDue = 8750.00;
@@ -25,52 +26,66 @@ export default function Finance() {
     { id: '5', date: 'Oct 25, 2024', description: 'Book Refund', amount: 125.00, type: 'refund' },
   ];
 
-  const handleMakePayment = () => {
-    setPaymentModalVisible(true);
+  const quickActions = [
+    { icon: 'credit-card', label: 'Make Payment', color: '#10b981' },
+    { icon: 'receipt', label: 'View Statement', color: '#3b82f6' },
+    { icon: 'school', label: 'Financial Aid', color: '#8b5cf6' },
+    { icon: 'history', label: 'Payment History', color: '#f59e0b' },
+  ];
+
+  const handleQuickAction = (label: string) => {
+    switch (label) {
+      case 'Make Payment':
+        setShowPaymentModal(true);
+        break;
+      case 'View Statement':
+        setShowStatementModal(true);
+        break;
+      case 'Financial Aid':
+        Alert.alert(
+          'Financial Aid',
+          'Your Financial Aid Status:\n\n✅ Federal Student Aid: £5,000\n✅ University Scholarship: £2,500\n\nTotal Aid: £7,500\n\nNext disbursement: Jan 10, 2025',
+          [{ text: 'OK' }]
+        );
+        break;
+      case 'Payment History':
+        Alert.alert(
+          'Payment History',
+          'Showing last 5 transactions.\n\nFor full payment history, check the Recent Transactions section below.',
+          [{ text: 'OK' }]
+        );
+        break;
+    }
   };
 
-  const handleViewStatement = () => {
-    setStatementModalVisible(true);
-  };
-
-  const handleFinancialAid = () => {
-    setAidModalVisible(true);
-  };
-
-  const handlePaymentHistory = () => {
-    Alert.alert(
-      'Payment History',
-      'Your recent transactions are displayed below. For full history, please visit the Student Portal.',
-      [{ text: 'OK' }]
-    );
-  };
-
-  const processPayment = () => {
-    const amount = parseFloat(paymentAmount);
-    if (isNaN(amount) || amount <= 0) {
+  const handlePayment = () => {
+    if (!paymentAmount || parseFloat(paymentAmount) <= 0) {
       Alert.alert('Invalid Amount', 'Please enter a valid payment amount');
       return;
     }
+
+    const amount = parseFloat(paymentAmount);
     if (amount > accountBalance) {
-      Alert.alert('Insufficient Funds', 'Your account balance is insufficient for this payment');
+      Alert.alert('Insufficient Balance', 'Payment amount exceeds your account balance');
       return;
     }
-    
-    setPaymentModalVisible(false);
-    Alert.alert(
-      'Payment Successful',
-      `£${amount.toFixed(2)} has been processed successfully.\n\nTransaction ID: ${Date.now()}\nRemaining Balance: £${(accountBalance - amount).toFixed(2)}`,
-      [{ text: 'OK' }]
-    );
-    setPaymentAmount('');
-  };
 
-  const quickActions = [
-    { icon: 'credit-card', label: 'Make Payment', color: '#10b981', onPress: handleMakePayment },
-    { icon: 'receipt', label: 'View Statement', color: '#3b82f6', onPress: handleViewStatement },
-    { icon: 'school', label: 'Financial Aid', color: '#8b5cf6', onPress: handleFinancialAid },
-    { icon: 'history', label: 'Payment History', color: '#f59e0b', onPress: handlePaymentHistory },
-  ];
+    Alert.alert(
+      'Confirm Payment',
+      `Pay £${amount.toFixed(2)} using ${selectedPaymentMethod === 'card' ? 'Card' : 'Bank Transfer'}?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Confirm',
+          onPress: () => {
+            setShowPaymentModal(false);
+            setPaymentAmount('');
+            Alert.alert('Success', `Payment of £${amount.toFixed(2)} processed successfully!`);
+          },
+        },
+      ]
+    );
+  };
 
   return (
     <View style={styles.page}>
@@ -112,7 +127,10 @@ export default function Finance() {
             </View>
             <Text style={styles.dueAmount}>£{tuitionDue.toFixed(2)}</Text>
             <Text style={styles.dueDate}>Due by {dueDate}</Text>
-            <TouchableOpacity style={styles.payButton} onPress={handleMakePayment}>
+            <TouchableOpacity style={styles.payButton} onPress={() => {
+              setPaymentAmount(tuitionDue.toString());
+              setShowPaymentModal(true);
+            }}>
               <Text style={styles.payButtonText}>Pay Now</Text>
               <MaterialIcons name="arrow-forward" size={18} color="#fff" />
             </TouchableOpacity>
@@ -127,7 +145,7 @@ export default function Finance() {
               <TouchableOpacity
                 key={index}
                 style={styles.actionCard}
-                onPress={action.onPress}
+                onPress={() => handleQuickAction(action.label)}
               >
                 <View style={[styles.actionIcon, { backgroundColor: action.color + '15' }]}>
                   <MaterialIcons name={action.icon as any} size={28} color={action.color} />
@@ -173,27 +191,80 @@ export default function Finance() {
       </ScrollView>
 
       {/* Payment Modal */}
-      <Modal visible={paymentModalVisible} transparent animationType="slide">
+      <Modal
+        visible={showPaymentModal}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowPaymentModal(false)}
+      >
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
+          <View style={[styles.modalContent, { paddingBottom: insets.bottom + 20 }]}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Make Payment</Text>
-              <TouchableOpacity onPress={() => setPaymentModalVisible(false)}>
+              <TouchableOpacity onPress={() => setShowPaymentModal(false)}>
                 <MaterialIcons name="close" size={24} color="#0D1140" />
               </TouchableOpacity>
             </View>
+
             <View style={styles.modalBody}>
-              <Text style={styles.modalLabel}>Enter Amount (£)</Text>
+              <Text style={styles.inputLabel}>Payment Amount (£)</Text>
               <TextInput
-                style={styles.modalInput}
+                style={styles.input}
                 placeholder="0.00"
-                keyboardType="numeric"
+                keyboardType="decimal-pad"
                 value={paymentAmount}
                 onChangeText={setPaymentAmount}
               />
-              <Text style={styles.modalBalance}>Available Balance: £{accountBalance.toFixed(2)}</Text>
-              <TouchableOpacity style={styles.modalButton} onPress={processPayment}>
-                <Text style={styles.modalButtonText}>Process Payment</Text>
+
+              <Text style={[styles.inputLabel, { marginTop: 20 }]}>Payment Method</Text>
+              <View style={styles.paymentMethods}>
+                <TouchableOpacity
+                  style={[
+                    styles.paymentMethodCard,
+                    selectedPaymentMethod === 'card' && styles.paymentMethodCardActive,
+                  ]}
+                  onPress={() => setSelectedPaymentMethod('card')}
+                >
+                  <MaterialIcons
+                    name="credit-card"
+                    size={28}
+                    color={selectedPaymentMethod === 'card' ? '#10b981' : '#9aa0c7'}
+                  />
+                  <Text
+                    style={[
+                      styles.paymentMethodText,
+                      selectedPaymentMethod === 'card' && styles.paymentMethodTextActive,
+                    ]}
+                  >
+                    Card
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[
+                    styles.paymentMethodCard,
+                    selectedPaymentMethod === 'bank' && styles.paymentMethodCardActive,
+                  ]}
+                  onPress={() => setSelectedPaymentMethod('bank')}
+                >
+                  <MaterialIcons
+                    name="account-balance"
+                    size={28}
+                    color={selectedPaymentMethod === 'bank' ? '#10b981' : '#9aa0c7'}
+                  />
+                  <Text
+                    style={[
+                      styles.paymentMethodText,
+                      selectedPaymentMethod === 'bank' && styles.paymentMethodTextActive,
+                    ]}
+                  >
+                    Bank Transfer
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              <TouchableOpacity style={styles.submitButton} onPress={handlePayment}>
+                <Text style={styles.submitButtonText}>Process Payment</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -201,64 +272,61 @@ export default function Finance() {
       </Modal>
 
       {/* Statement Modal */}
-      <Modal visible={statementModalVisible} transparent animationType="slide">
+      <Modal
+        visible={showStatementModal}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowStatementModal(false)}
+      >
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
+          <View style={[styles.modalContent, { paddingBottom: insets.bottom + 20 }]}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Account Statement</Text>
-              <TouchableOpacity onPress={() => setStatementModalVisible(false)}>
+              <TouchableOpacity onPress={() => setShowStatementModal(false)}>
                 <MaterialIcons name="close" size={24} color="#0D1140" />
               </TouchableOpacity>
             </View>
-            <ScrollView style={styles.modalBody}>
-              <View style={styles.statementRow}>
-                <Text style={styles.statementLabel}>Account Balance</Text>
-                <Text style={styles.statementValue}>£{accountBalance.toFixed(2)}</Text>
-              </View>
-              <View style={styles.statementRow}>
-                <Text style={styles.statementLabel}>Tuition Due</Text>
-                <Text style={[styles.statementValue, { color: '#ef4444' }]}>£{tuitionDue.toFixed(2)}</Text>
-              </View>
-              <View style={styles.statementRow}>
-                <Text style={styles.statementLabel}>Due Date</Text>
-                <Text style={styles.statementValue}>{dueDate}</Text>
-              </View>
-              <View style={styles.statementDivider} />
-              <Text style={styles.statementNote}>
-                For detailed statements and transaction history, please visit the Student Finance Portal or contact the Finance Office.
-              </Text>
-              <TouchableOpacity style={styles.modalButton} onPress={() => Alert.alert('Download', 'Statement will be sent to your email')}>
-                <MaterialIcons name="download" size={20} color="#fff" style={{ marginRight: 8 }} />
-                <Text style={styles.modalButtonText}>Download PDF</Text>
-              </TouchableOpacity>
-            </ScrollView>
-          </View>
-        </View>
-      </Modal>
 
-      {/* Financial Aid Modal */}
-      <Modal visible={aidModalVisible} transparent animationType="slide">
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Financial Aid</Text>
-              <TouchableOpacity onPress={() => setAidModalVisible(false)}>
-                <MaterialIcons name="close" size={24} color="#0D1140" />
-              </TouchableOpacity>
-            </View>
             <ScrollView style={styles.modalBody}>
-              <View style={styles.aidCard}>
-                <MaterialIcons name="check-circle" size={48} color="#10b981" />
-                <Text style={styles.aidTitle}>Aid Package Active</Text>
-                <Text style={styles.aidAmount}>£5,000 / Semester</Text>
+              <View style={styles.statementCard}>
+                <Text style={styles.statementTitle}>Current Balance</Text>
+                <Text style={styles.statementAmount}>£{accountBalance.toFixed(2)}</Text>
               </View>
-              <View style={styles.aidDetails}>
-                <Text style={styles.aidLabel}>Type: Merit Scholarship</Text>
-                <Text style={styles.aidLabel}>Status: Active</Text>
-                <Text style={styles.aidLabel}>Next Disbursement: Jan 5, 2025</Text>
+
+              <View style={styles.statementCard}>
+                <Text style={styles.statementTitle}>Outstanding Balance</Text>
+                <Text style={[styles.statementAmount, { color: '#ef4444' }]}>£{tuitionDue.toFixed(2)}</Text>
               </View>
-              <TouchableOpacity style={styles.modalButton} onPress={() => Alert.alert('Apply', 'Visit Student Finance Office for new applications')}>
-                <Text style={styles.modalButtonText}>Apply for More Aid</Text>
+
+              <View style={styles.statementDivider} />
+
+              <Text style={styles.statementSectionTitle}>Recent Transactions</Text>
+              {transactions.slice(0, 3).map((transaction) => (
+                <View key={transaction.id} style={styles.statementRow}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.statementRowTitle}>{transaction.description}</Text>
+                    <Text style={styles.statementRowDate}>{transaction.date}</Text>
+                  </View>
+                  <Text
+                    style={[
+                      styles.statementRowAmount,
+                      { color: transaction.amount > 0 ? '#10b981' : '#0D1140' },
+                    ]}
+                  >
+                    {transaction.amount > 0 ? '+' : ''}£{Math.abs(transaction.amount).toFixed(2)}
+                  </Text>
+                </View>
+              ))}
+
+              <TouchableOpacity
+                style={styles.downloadButton}
+                onPress={() => {
+                  setShowStatementModal(false);
+                  Alert.alert('Download Statement', 'Statement will be sent to your email');
+                }}
+              >
+                <MaterialIcons name="download" size={20} color="#10b981" />
+                <Text style={styles.downloadButtonText}>Download Full Statement</Text>
               </TouchableOpacity>
             </ScrollView>
           </View>
@@ -311,24 +379,29 @@ const styles = StyleSheet.create({
   transactionAmount: { fontSize: 16, fontWeight: '700' },
 
   // Modals
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
-  modalContent: { backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, maxHeight: '80%' },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(13,17,64,0.5)', justifyContent: 'flex-end' },
+  modalContent: { backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, maxHeight: '90%' },
   modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, borderBottomWidth: 1, borderBottomColor: '#e8eaf0' },
   modalTitle: { fontSize: 20, fontWeight: '700', color: '#0D1140' },
   modalBody: { padding: 20 },
-  modalLabel: { fontSize: 14, fontWeight: '600', color: '#6b7280', marginBottom: 8 },
-  modalInput: { backgroundColor: '#f8f9fb', borderRadius: 12, padding: 16, fontSize: 24, fontWeight: '700', color: '#0D1140', marginBottom: 12 },
-  modalBalance: { fontSize: 13, color: '#9aa0c7', marginBottom: 20 },
-  modalButton: { backgroundColor: '#0D1140', borderRadius: 12, paddingVertical: 16, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', marginTop: 12 },
-  modalButtonText: { fontSize: 16, fontWeight: '600', color: '#fff' },
-  statementRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 12 },
-  statementLabel: { fontSize: 15, color: '#6b7280' },
-  statementValue: { fontSize: 15, fontWeight: '700', color: '#0D1140' },
-  statementDivider: { height: 1, backgroundColor: '#e8eaf0', marginVertical: 16 },
-  statementNote: { fontSize: 13, color: '#9aa0c7', lineHeight: 20, marginBottom: 16 },
-  aidCard: { backgroundColor: '#10b98115', borderRadius: 16, padding: 24, alignItems: 'center', marginBottom: 20 },
-  aidTitle: { fontSize: 18, fontWeight: '700', color: '#0D1140', marginTop: 12, marginBottom: 8 },
-  aidAmount: { fontSize: 28, fontWeight: '800', color: '#10b981' },
-  aidDetails: { backgroundColor: '#f8f9fb', borderRadius: 12, padding: 16, marginBottom: 12 },
-  aidLabel: { fontSize: 14, color: '#6b7280', marginBottom: 8 },
+  inputLabel: { fontSize: 14, fontWeight: '600', color: '#0D1140', marginBottom: 8 },
+  input: { backgroundColor: '#f8f9fb', borderRadius: 12, padding: 16, fontSize: 16, color: '#0D1140', borderWidth: 1, borderColor: '#e8eaf0' },
+  paymentMethods: { flexDirection: 'row', gap: 12, marginBottom: 24 },
+  paymentMethodCard: { flex: 1, backgroundColor: '#f8f9fb', borderRadius: 16, padding: 20, alignItems: 'center', borderWidth: 2, borderColor: '#e8eaf0' },
+  paymentMethodCardActive: { borderColor: '#10b981', backgroundColor: '#10b98108' },
+  paymentMethodText: { fontSize: 14, fontWeight: '600', color: '#9aa0c7', marginTop: 8 },
+  paymentMethodTextActive: { color: '#10b981' },
+  submitButton: { backgroundColor: '#10b981', borderRadius: 12, padding: 16, alignItems: 'center' },
+  submitButtonText: { fontSize: 16, fontWeight: '700', color: '#fff' },
+  statementCard: { backgroundColor: '#f8f9fb', borderRadius: 16, padding: 20, marginBottom: 12 },
+  statementTitle: { fontSize: 14, color: '#9aa0c7', marginBottom: 8 },
+  statementAmount: { fontSize: 28, fontWeight: '800', color: '#10b981' },
+  statementDivider: { height: 1, backgroundColor: '#e8eaf0', marginVertical: 20 },
+  statementSectionTitle: { fontSize: 16, fontWeight: '700', color: '#0D1140', marginBottom: 16 },
+  statementRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#f8f9fb' },
+  statementRowTitle: { fontSize: 14, fontWeight: '600', color: '#0D1140', marginBottom: 4 },
+  statementRowDate: { fontSize: 12, color: '#9aa0c7' },
+  statementRowAmount: { fontSize: 15, fontWeight: '700' },
+  downloadButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#10b98115', borderRadius: 12, padding: 16, marginTop: 20, gap: 8 },
+  downloadButtonText: { fontSize: 15, fontWeight: '600', color: '#10b981' },
 });
