@@ -2,13 +2,15 @@ import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function Library() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchModalVisible, setSearchModalVisible] = useState(false);
+  const [studyRoomModalVisible, setStudyRoomModalVisible] = useState(false);
 
   const borrowedBooks = [
     { id: '1', title: 'Data Structures and Algorithms', author: 'Thomas Cormen', dueDate: 'Jan 20, 2025', status: 'active', color: '#10b981' },
@@ -21,11 +23,57 @@ export default function Library() {
     { id: '2', title: 'Introduction to Algorithms', author: 'CLRS', available: 'Jan 22, 2025' },
   ];
 
+  const handleRenewBook = (bookTitle: string, dueDate: string) => {
+    const newDate = new Date(dueDate);
+    newDate.setDate(newDate.getDate() + 14); // Add 14 days
+    Alert.alert(
+      'Book Renewed',
+      `"${bookTitle}" has been renewed successfully!\n\nNew due date: ${newDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`,
+      [{ text: 'OK' }]
+    );
+  };
+
+  const handleSearchCatalog = () => {
+    setSearchModalVisible(true);
+  };
+
+  const handleStudyRooms = () => {
+    setStudyRoomModalVisible(true);
+  };
+
+  const handleEResources = () => {
+    Alert.alert(
+      'E-Resources',
+      'Access thousands of online journals, databases, and e-books:\n\n• JSTOR\n• IEEE Xplore\n• SpringerLink\n• ProQuest\n• Wiley Online Library',
+      [{ text: 'OK' }]
+    );
+  };
+
+  const handleAskLibrarian = () => {
+    Alert.alert(
+      'Ask a Librarian',
+      'Get help from our librarians:\n\n📧 Email: library@gre.ac.uk\n💬 Live Chat: Available 9am-5pm\n📞 Phone: +44 20 8331 9000',
+      [
+        { text: 'Send Email', onPress: () => alert('Opening email...') },
+        { text: 'Close' }
+      ]
+    );
+  };
+
+  const performSearch = () => {
+    if (!searchQuery.trim()) {
+      Alert.alert('Search', 'Please enter a search term');
+      return;
+    }
+    setSearchModalVisible(false);
+    Alert.alert('Search Results', `Searching for "${searchQuery}"...\n\nFound 15 results in the catalog. This feature will show detailed results in a future update.`);
+  };
+
   const quickLinks = [
-    { icon: 'search', label: 'Search Catalog', color: '#3b82f6' },
-    { icon: 'book', label: 'Study Rooms', color: '#8b5cf6' },
-    { icon: 'laptop', label: 'E-Resources', color: '#10b981' },
-    { icon: 'help-outline', label: 'Ask Librarian', color: '#ec4899' },
+    { icon: 'search', label: 'Search Catalog', color: '#3b82f6', onPress: handleSearchCatalog },
+    { icon: 'book', label: 'Study Rooms', color: '#8b5cf6', onPress: handleStudyRooms },
+    { icon: 'laptop', label: 'E-Resources', color: '#10b981', onPress: handleEResources },
+    { icon: 'help-outline', label: 'Ask Librarian', color: '#ec4899', onPress: handleAskLibrarian },
   ];
 
   return (
@@ -63,7 +111,7 @@ export default function Library() {
               <TouchableOpacity
                 key={index}
                 style={styles.quickLinkCard}
-                onPress={() => alert(`${link.label} coming soon`)}
+                onPress={link.onPress}
               >
                 <View style={[styles.quickLinkIcon, { backgroundColor: link.color + '15' }]}>
                   <MaterialIcons name={link.icon as any} size={26} color={link.color} />
@@ -84,7 +132,7 @@ export default function Library() {
             <TouchableOpacity
               key={book.id}
               style={styles.bookCard}
-              onPress={() => alert(`Renew "${book.title}"?`)}
+              onPress={() => handleRenewBook(book.title, book.dueDate)}
             >
               <View style={[styles.bookColorStrip, { backgroundColor: book.color }]} />
               <View style={styles.bookContent}>
@@ -103,7 +151,10 @@ export default function Library() {
                 </View>
                 <TouchableOpacity
                   style={[styles.renewButton, { backgroundColor: book.color + '15' }]}
-                  onPress={() => alert(`Renew "${book.title}"?`)}
+                  onPress={(e) => {
+                    e.stopPropagation();
+                    handleRenewBook(book.title, book.dueDate);
+                  }}
                 >
                   <MaterialIcons name="refresh" size={20} color={book.color} />
                 </TouchableOpacity>
@@ -158,6 +209,75 @@ export default function Library() {
           </LinearGradient>
         </View>
       </ScrollView>
+
+      {/* Search Modal */}
+      <Modal visible={searchModalVisible} transparent animationType="slide">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Search Catalog</Text>
+              <TouchableOpacity onPress={() => setSearchModalVisible(false)}>
+                <MaterialIcons name="close" size={24} color="#0D1140" />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.modalBody}>
+              <TextInput
+                style={styles.searchModalInput}
+                placeholder="Enter book title, author, or ISBN..."
+                placeholderTextColor="#9aa0c7"
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+                autoFocus
+              />
+              <TouchableOpacity style={styles.searchButton} onPress={performSearch}>
+                <MaterialIcons name="search" size={20} color="#fff" style={{ marginRight: 8 }} />
+                <Text style={styles.searchButtonText}>Search</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Study Room Modal */}
+      <Modal visible={studyRoomModalVisible} transparent animationType="slide">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Book Study Room</Text>
+              <TouchableOpacity onPress={() => setStudyRoomModalVisible(false)}>
+                <MaterialIcons name="close" size={24} color="#0D1140" />
+              </TouchableOpacity>
+            </View>
+            <ScrollView style={styles.modalBody}>
+              <View style={styles.roomCard}>
+                <Text style={styles.roomName}>Room 101 - Small (4 people)</Text>
+                <Text style={styles.roomStatus}>✅ Available</Text>
+                <TouchableOpacity style={styles.bookRoomButton} onPress={() => {
+                  setStudyRoomModalVisible(false);
+                  Alert.alert('Room Booked', 'Study Room 101 has been reserved for you today 2:00 PM - 4:00 PM');
+                }}>
+                  <Text style={styles.bookRoomText}>Book Now</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.roomCard}>
+                <Text style={styles.roomName}>Room 202 - Medium (8 people)</Text>
+                <Text style={styles.roomStatus}>✅ Available</Text>
+                <TouchableOpacity style={styles.bookRoomButton} onPress={() => {
+                  setStudyRoomModalVisible(false);
+                  Alert.alert('Room Booked', 'Study Room 202 has been reserved for you today 3:00 PM - 5:00 PM');
+                }}>
+                  <Text style={styles.bookRoomText}>Book Now</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.roomCard}>
+                <Text style={styles.roomName}>Room 303 - Large (12 people)</Text>
+                <Text style={[styles.roomStatus, { color: '#ef4444' }]}>❌ Occupied</Text>
+                <Text style={styles.roomNote}>Next available: 6:00 PM</Text>
+              </View>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -214,4 +334,20 @@ const styles = StyleSheet.create({
   hoursRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8 },
   hoursDay: { fontSize: 15, color: '#6b7280', fontWeight: '500' },
   hoursTime: { fontSize: 15, color: '#0D1140', fontWeight: '600' },
+
+  // Modals
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
+  modalContent: { backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, maxHeight: '70%' },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, borderBottomWidth: 1, borderBottomColor: '#e8eaf0' },
+  modalTitle: { fontSize: 20, fontWeight: '700', color: '#0D1140' },
+  modalBody: { padding: 20 },
+  searchModalInput: { backgroundColor: '#f8f9fb', borderRadius: 12, padding: 16, fontSize: 16, color: '#0D1140', marginBottom: 16 },
+  searchButton: { backgroundColor: '#3b82f6', borderRadius: 12, paddingVertical: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
+  searchButtonText: { fontSize: 16, fontWeight: '600', color: '#fff' },
+  roomCard: { backgroundColor: '#f8f9fb', borderRadius: 12, padding: 16, marginBottom: 12 },
+  roomName: { fontSize: 16, fontWeight: '700', color: '#0D1140', marginBottom: 8 },
+  roomStatus: { fontSize: 14, color: '#10b981', marginBottom: 12, fontWeight: '600' },
+  roomNote: { fontSize: 13, color: '#9aa0c7', marginTop: 8 },
+  bookRoomButton: { backgroundColor: '#8b5cf6', borderRadius: 10, paddingVertical: 10, alignItems: 'center' },
+  bookRoomText: { fontSize: 14, fontWeight: '600', color: '#fff' },
 });
