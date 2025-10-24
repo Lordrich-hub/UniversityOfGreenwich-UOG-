@@ -244,7 +244,6 @@ const styles = StyleSheet.create({
   statsRow: { flexDirection: 'row', paddingHorizontal: 16, paddingTop: 24, paddingBottom: 8, gap: 12 },
   statBox: { flex: 1, backgroundColor: '#f8f9fb', borderRadius: 16, padding: 16, alignItems: 'center' },
   statNumber: { fontSize: 24, fontWeight: '800', color: '#0D1140', marginBottom: 4 },
-  statLabel: { fontSize: 11, color: '#6b7280' }, color: '#0D1140', marginBottom: 4 },
   statLabel: { fontSize: 11, color: '#6b7280' },
 
   modulesList: { flex: 1, paddingHorizontal: 16 },
