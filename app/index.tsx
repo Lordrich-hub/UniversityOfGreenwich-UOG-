@@ -2,6 +2,7 @@ import { useRouter } from 'expo-router';
 import React, { useEffect } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withDelay, withTiming } from 'react-native-reanimated';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Spacing and sizing constants (named after the actual asset files for clarity)
 // uog_logo.png (compass) spacing to Greenwich-LOGO_writng_only.png (text)
@@ -47,8 +48,16 @@ export default function Index() {
 
     const navTimer = DEBUG_GUIDE
       ? undefined
-      : setTimeout(() => {
-          router.replace('/(tabs)/home');
+      : setTimeout(async () => {
+          // Check user role and navigate accordingly
+          const userRole = await AsyncStorage.getItem('userRole');
+          if (userRole === 'student') {
+            router.replace('/(tabs)/home');
+          } else if (userRole === 'staff') {
+            router.replace('/(staff)/home');
+          } else {
+            router.replace('/choose-role');
+          }
         }, 10000);
     
     return () => {

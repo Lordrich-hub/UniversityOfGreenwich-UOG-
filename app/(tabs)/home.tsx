@@ -8,6 +8,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 
 // removed fixed top-level HERO_HEIGHT to compute it per-device inside the component
+// removed fixed top-level HERO_HEIGHT to compute it per-device inside the component
 
 export default function Home() {
   const router = useRouter();

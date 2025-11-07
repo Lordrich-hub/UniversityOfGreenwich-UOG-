@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface MenuItem {
   icon: string;
@@ -71,6 +72,23 @@ export default function Profile() {
     );
   };
 
+  const handleSwitchRole = async () => {
+    Alert.alert(
+      'Switch Role',
+      'Do you want to switch to staff view?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Switch',
+          onPress: async () => {
+            await AsyncStorage.removeItem('userRole');
+            router.replace('/choose-role');
+          },
+        },
+      ]
+    );
+  };
+
   const menuSections: { id: string; title?: string; items: MenuItem[] }[] = [
     {
       id: 'academic',
@@ -96,6 +114,7 @@ export default function Profile() {
         { icon: 'notifications', iconLib: 'MaterialIcons', label: 'Notifications', onPress: () => router.push('/notifications') },
         { icon: 'security', iconLib: 'MaterialIcons', label: 'Privacy & Security', onPress: () => router.push('/privacy') },
         { icon: 'help', iconLib: 'MaterialIcons', label: 'Help & Support', onPress: () => router.push('/support') },
+        { icon: 'swap-horiz', iconLib: 'MaterialIcons', label: 'Switch to Staff View', onPress: handleSwitchRole },
         { icon: 'logout', iconLib: 'MaterialIcons', label: 'Sign Out', onPress: () => Alert.alert('Sign Out', 'Are you sure you want to sign out?', [{ text: 'Cancel' }, { text: 'Sign Out', style: 'destructive', onPress: () => router.replace('/') }]) },
       ],
     },

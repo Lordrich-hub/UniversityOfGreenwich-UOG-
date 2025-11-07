@@ -2,6 +2,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
 import { Alert, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type DaySchedule = {
@@ -16,6 +17,8 @@ type DaySchedule = {
   building: string;
   description: string;
   credits: number;
+  latitude: number;
+  longitude: number;
 };
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
@@ -24,69 +27,69 @@ const WEEKS = ['This Week', 'Next Week', 'Week After'];
 // Schedules for different weeks
 const THIS_WEEK_SCHEDULE: { [key: string]: DaySchedule[] } = {
   Mon: [
-    { id: '1', time: '09:00 - 10:30', title: 'Advanced Algorithms', lecturer: 'Dr. Smith', room: 'CS Lab 3', building: 'Stockwell Street', type: 'lab', color: '#8b5cf6', emoji: '💻', description: 'Learn advanced algorithm design and analysis techniques', credits: 15 },
-    { id: '2', time: '11:00 - 12:30', title: 'Data Structures', lecturer: 'Prof. Johnson', room: 'Room 201', building: 'Queen Anne', type: 'lecture', color: '#3b82f6', emoji: '📚', description: 'Study fundamental data structures and their applications', credits: 15 },
-    { id: '3', time: '14:00 - 15:30', title: 'Web Development', lecturer: 'Dr. Chen', room: 'CS Lab 1', building: 'Stockwell Street', type: 'lab', color: '#10b981', emoji: '🌐', description: 'Build modern web applications with latest technologies', credits: 15 },
+    { id: '1', time: '09:00 - 10:30', title: 'Advanced Algorithms', lecturer: 'Dr. Smith', room: 'CS Lab 3', building: 'Stockwell Street', type: 'lab', color: '#8b5cf6', emoji: '💻', description: 'Learn advanced algorithm design and analysis techniques', credits: 15, latitude: 51.4834, longitude: -0.0067 },
+    { id: '2', time: '11:00 - 12:30', title: 'Data Structures', lecturer: 'Prof. Johnson', room: 'Room 201', building: 'Queen Anne', type: 'lecture', color: '#3b82f6', emoji: '📚', description: 'Study fundamental data structures and their applications', credits: 15, latitude: 51.4826, longitude: -0.0077 },
+    { id: '3', time: '14:00 - 15:30', title: 'Web Development', lecturer: 'Dr. Chen', room: 'CS Lab 1', building: 'Stockwell Street', type: 'lab', color: '#10b981', emoji: '🌐', description: 'Build modern web applications with latest technologies', credits: 15, latitude: 51.4834, longitude: -0.0067 },
   ],
   Tue: [
-    { id: '4', time: '10:00 - 11:30', title: 'Database Systems', lecturer: 'Dr. Williams', room: 'Room 305', building: 'Queen Anne', type: 'lecture', color: '#f59e0b', emoji: '🗄️', description: 'Database design, SQL, and management systems', credits: 15 },
-    { id: '5', time: '13:00 - 14:30', title: 'Software Engineering', lecturer: 'Prof. Davis', room: 'Room 102', building: 'Dreadnought', type: 'seminar', color: '#ec4899', emoji: '⚙️', description: 'Software development methodologies and practices', credits: 15 },
+    { id: '4', time: '10:00 - 11:30', title: 'Database Systems', lecturer: 'Dr. Williams', room: 'Room 305', building: 'Queen Anne', type: 'lecture', color: '#f59e0b', emoji: '🗄️', description: 'Database design, SQL, and management systems', credits: 15, latitude: 51.4826, longitude: -0.0077 },
+    { id: '5', time: '13:00 - 14:30', title: 'Software Engineering', lecturer: 'Prof. Davis', room: 'Room 102', building: 'Dreadnought', type: 'seminar', color: '#ec4899', emoji: '⚙️', description: 'Software development methodologies and practices', credits: 15, latitude: 51.4829, longitude: -0.0071 },
   ],
   Wed: [
-    { id: '6', time: '09:00 - 10:30', title: 'Machine Learning', lecturer: 'Dr. Martinez', room: 'CS Lab 2', building: 'Stockwell Street', type: 'lab', color: '#06b6d4', emoji: '🤖', description: 'Introduction to ML algorithms and neural networks', credits: 20 },
-    { id: '7', time: '11:00 - 12:00', title: 'Ethics in Tech', lecturer: 'Prof. Anderson', room: 'Lecture Hall A', building: 'Queen Anne', type: 'lecture', color: '#8b5cf6', emoji: '⚖️', description: 'Ethical considerations in technology and AI', credits: 10 },
-    { id: '8', time: '14:00 - 15:30', title: 'Tutorial Session', lecturer: 'TA: Sarah Lee', room: 'Room 201', building: 'Queen Anne', type: 'tutorial', color: '#f59e0b', emoji: '✏️', description: 'Weekly tutorial for assignment help', credits: 0 },
+    { id: '6', time: '09:00 - 10:30', title: 'Machine Learning', lecturer: 'Dr. Martinez', room: 'CS Lab 2', building: 'Stockwell Street', type: 'lab', color: '#06b6d4', emoji: '🤖', description: 'Introduction to ML algorithms and neural networks', credits: 20, latitude: 51.4834, longitude: -0.0067 },
+    { id: '7', time: '11:00 - 12:00', title: 'Ethics in Tech', lecturer: 'Prof. Anderson', room: 'Lecture Hall A', building: 'Queen Anne', type: 'lecture', color: '#8b5cf6', emoji: '⚖️', description: 'Ethical considerations in technology and AI', credits: 10, latitude: 51.4826, longitude: -0.0077 },
+    { id: '8', time: '14:00 - 15:30', title: 'Tutorial Session', lecturer: 'TA: Sarah Lee', room: 'Room 201', building: 'Queen Anne', type: 'tutorial', color: '#f59e0b', emoji: '✏️', description: 'Weekly tutorial for assignment help', credits: 0, latitude: 51.4826, longitude: -0.0077 },
   ],
   Thu: [
-    { id: '9', time: '10:00 - 11:30', title: 'Mobile App Dev', lecturer: 'Dr. Taylor', room: 'CS Lab 3', building: 'Stockwell Street', type: 'lab', color: '#10b981', emoji: '📱', description: 'Develop iOS and Android applications', credits: 15 },
-    { id: '10', time: '13:00 - 14:30', title: 'Computer Networks', lecturer: 'Prof. Brown', room: 'Room 204', building: 'Dreadnought', type: 'lecture', color: '#3b82f6', emoji: '🌐', description: 'Networking protocols and infrastructure', credits: 15 },
+    { id: '9', time: '10:00 - 11:30', title: 'Mobile App Dev', lecturer: 'Dr. Taylor', room: 'CS Lab 3', building: 'Stockwell Street', type: 'lab', color: '#10b981', emoji: '📱', description: 'Develop iOS and Android applications', credits: 15, latitude: 51.4834, longitude: -0.0067 },
+    { id: '10', time: '13:00 - 14:30', title: 'Computer Networks', lecturer: 'Prof. Brown', room: 'Room 204', building: 'Dreadnought', type: 'lecture', color: '#3b82f6', emoji: '🌐', description: 'Networking protocols and infrastructure', credits: 15, latitude: 51.4829, longitude: -0.0071 },
   ],
   Fri: [
-    { id: '11', time: '09:00 - 10:30', title: 'Cloud Computing', lecturer: 'Dr. Wilson', room: 'Room 301', building: 'Queen Anne', type: 'lecture', color: '#06b6d4', emoji: '☁️', description: 'Cloud platforms, services, and deployment', credits: 15 },
-    { id: '12', time: '11:00 - 12:30', title: 'Project Workshop', lecturer: 'All Staff', room: 'Innovation Lab', building: 'Stockwell Street', type: 'seminar', color: '#ec4899', emoji: '🚀', description: 'Collaborative project development session', credits: 0 },
+    { id: '11', time: '09:00 - 10:30', title: 'Cloud Computing', lecturer: 'Dr. Wilson', room: 'Room 301', building: 'Queen Anne', type: 'lecture', color: '#06b6d4', emoji: '☁️', description: 'Cloud platforms, services, and deployment', credits: 15, latitude: 51.4826, longitude: -0.0077 },
+    { id: '12', time: '11:00 - 12:30', title: 'Project Workshop', lecturer: 'All Staff', room: 'Innovation Lab', building: 'Stockwell Street', type: 'seminar', color: '#ec4899', emoji: '🚀', description: 'Collaborative project development session', credits: 0, latitude: 51.4834, longitude: -0.0067 },
   ],
 };
 
 const NEXT_WEEK_SCHEDULE: { [key: string]: DaySchedule[] } = {
   Mon: [
-    { id: 'n1', time: '09:00 - 10:30', title: 'AI & Robotics', lecturer: 'Dr. Zhang', room: 'CS Lab 2', building: 'Stockwell Street', type: 'lab', color: '#ec4899', emoji: '🤖', description: 'Introduction to AI and robotics systems', credits: 15 },
-    { id: 'n2', time: '11:00 - 12:30', title: 'Systems Design', lecturer: 'Prof. Lee', room: 'Room 305', building: 'Queen Anne', type: 'lecture', color: '#f59e0b', emoji: '⚙️', description: 'Learn system architecture and design patterns', credits: 15 },
+    { id: 'n1', time: '09:00 - 10:30', title: 'AI & Robotics', lecturer: 'Dr. Zhang', room: 'CS Lab 2', building: 'Stockwell Street', type: 'lab', color: '#ec4899', emoji: '🤖', description: 'Introduction to AI and robotics systems', credits: 15, latitude: 51.4834, longitude: -0.0067 },
+    { id: 'n2', time: '11:00 - 12:30', title: 'Systems Design', lecturer: 'Prof. Lee', room: 'Room 305', building: 'Queen Anne', type: 'lecture', color: '#f59e0b', emoji: '⚙️', description: 'Learn system architecture and design patterns', credits: 15, latitude: 51.4826, longitude: -0.0077 },
   ],
   Tue: [
-    { id: 'n3', time: '10:00 - 11:30', title: 'Cybersecurity', lecturer: 'Dr. Parker', room: 'Room 201', building: 'Queen Anne', type: 'lecture', color: '#8b5cf6', emoji: '🔒', description: 'Network security and ethical hacking', credits: 15 },
-    { id: 'n4', time: '14:00 - 15:30', title: 'Blockchain Tech', lecturer: 'Prof. Kim', room: 'CS Lab 1', building: 'Stockwell Street', type: 'lab', color: '#06b6d4', emoji: '⛓️', description: 'Decentralized applications and smart contracts', credits: 15 },
+    { id: 'n3', time: '10:00 - 11:30', title: 'Cybersecurity', lecturer: 'Dr. Parker', room: 'Room 201', building: 'Queen Anne', type: 'lecture', color: '#8b5cf6', emoji: '🔒', description: 'Network security and ethical hacking', credits: 15, latitude: 51.4826, longitude: -0.0077 },
+    { id: 'n4', time: '14:00 - 15:30', title: 'Blockchain Tech', lecturer: 'Prof. Kim', room: 'CS Lab 1', building: 'Stockwell Street', type: 'lab', color: '#06b6d4', emoji: '⛓️', description: 'Decentralized applications and smart contracts', credits: 15, latitude: 51.4834, longitude: -0.0067 },
   ],
   Wed: [
-    { id: 'n5', time: '09:00 - 10:30', title: 'Game Development', lecturer: 'Dr. Ross', room: 'Room 102', building: 'Dreadnought', type: 'lab', color: '#10b981', emoji: '🎮', description: 'Create interactive games with Unity', credits: 20 },
-    { id: 'n6', time: '13:00 - 14:30', title: 'UI/UX Design', lecturer: 'Prof. Chen', room: 'Room 204', building: 'Dreadnought', type: 'seminar', color: '#ec4899', emoji: '🎨', description: 'User interface and experience principles', credits: 10 },
+    { id: 'n5', time: '09:00 - 10:30', title: 'Game Development', lecturer: 'Dr. Ross', room: 'Room 102', building: 'Dreadnought', type: 'lab', color: '#10b981', emoji: '🎮', description: 'Create interactive games with Unity', credits: 20, latitude: 51.4829, longitude: -0.0071 },
+    { id: 'n6', time: '13:00 - 14:30', title: 'UI/UX Design', lecturer: 'Prof. Chen', room: 'Room 204', building: 'Dreadnought', type: 'seminar', color: '#ec4899', emoji: '🎨', description: 'User interface and experience principles', credits: 10, latitude: 51.4829, longitude: -0.0071 },
   ],
   Thu: [
-    { id: 'n7', time: '10:00 - 11:30', title: 'DevOps Practice', lecturer: 'Dr. Taylor', room: 'CS Lab 3', building: 'Stockwell Street', type: 'lab', color: '#3b82f6', emoji: '⚡', description: 'CI/CD pipelines and deployment automation', credits: 15 },
+    { id: 'n7', time: '10:00 - 11:30', title: 'DevOps Practice', lecturer: 'Dr. Taylor', room: 'CS Lab 3', building: 'Stockwell Street', type: 'lab', color: '#3b82f6', emoji: '⚡', description: 'CI/CD pipelines and deployment automation', credits: 15, latitude: 51.4834, longitude: -0.0067 },
   ],
   Fri: [
-    { id: 'n8', time: '09:00 - 10:30', title: 'Data Analytics', lecturer: 'Prof. Martinez', room: 'Room 301', building: 'Queen Anne', type: 'lecture', color: '#f59e0b', emoji: '📊', description: 'Big data processing and visualization', credits: 15 },
-    { id: 'n9', time: '11:00 - 12:30', title: 'Project Sprint', lecturer: 'All Staff', room: 'Innovation Lab', building: 'Stockwell Street', type: 'seminar', color: '#8b5cf6', emoji: '🚀', description: 'Agile development sprint session', credits: 0 },
+    { id: 'n8', time: '09:00 - 10:30', title: 'Data Analytics', lecturer: 'Prof. Martinez', room: 'Room 301', building: 'Queen Anne', type: 'lecture', color: '#f59e0b', emoji: '📊', description: 'Big data processing and visualization', credits: 15, latitude: 51.4826, longitude: -0.0077 },
+    { id: 'n9', time: '11:00 - 12:30', title: 'Project Sprint', lecturer: 'All Staff', room: 'Innovation Lab', building: 'Stockwell Street', type: 'seminar', color: '#8b5cf6', emoji: '🚀', description: 'Agile development sprint session', credits: 0, latitude: 51.4834, longitude: -0.0067 },
   ],
 };
 
 const WEEK_AFTER_SCHEDULE: { [key: string]: DaySchedule[] } = {
   Mon: [
-    { id: 'w1', time: '09:00 - 10:30', title: 'Quantum Computing', lecturer: 'Dr. White', room: 'Room 305', building: 'Queen Anne', type: 'lecture', color: '#06b6d4', emoji: '⚛️', description: 'Introduction to quantum algorithms', credits: 20 },
-    { id: 'w2', time: '14:00 - 15:30', title: 'AR/VR Development', lecturer: 'Prof. Black', room: 'CS Lab 2', building: 'Stockwell Street', type: 'lab', color: '#ec4899', emoji: '🥽', description: 'Augmented and virtual reality applications', credits: 15 },
+    { id: 'w1', time: '09:00 - 10:30', title: 'Quantum Computing', lecturer: 'Dr. White', room: 'Room 305', building: 'Queen Anne', type: 'lecture', color: '#06b6d4', emoji: '⚛️', description: 'Introduction to quantum algorithms', credits: 20, latitude: 51.4826, longitude: -0.0077 },
+    { id: 'w2', time: '14:00 - 15:30', title: 'AR/VR Development', lecturer: 'Prof. Black', room: 'CS Lab 2', building: 'Stockwell Street', type: 'lab', color: '#ec4899', emoji: '🥽', description: 'Augmented and virtual reality applications', credits: 15, latitude: 51.4834, longitude: -0.0067 },
   ],
   Tue: [
-    { id: 'w3', time: '10:00 - 11:30', title: 'IoT Systems', lecturer: 'Dr. Green', room: 'Room 102', building: 'Dreadnought', type: 'lecture', color: '#10b981', emoji: '📡', description: 'Internet of Things and sensor networks', credits: 15 },
+    { id: 'w3', time: '10:00 - 11:30', title: 'IoT Systems', lecturer: 'Dr. Green', room: 'Room 102', building: 'Dreadnought', type: 'lecture', color: '#10b981', emoji: '📡', description: 'Internet of Things and sensor networks', credits: 15, latitude: 51.4829, longitude: -0.0071 },
   ],
   Wed: [
-    { id: 'w4', time: '09:00 - 10:30', title: 'Cloud Architecture', lecturer: 'Prof. Blue', room: 'Room 201', building: 'Queen Anne', type: 'lecture', color: '#3b82f6', emoji: '☁️', description: 'Advanced cloud design patterns', credits: 15 },
-    { id: 'w5', time: '11:00 - 12:00', title: 'Research Methods', lecturer: 'Dr. Gray', room: 'Lecture Hall A', building: 'Queen Anne', type: 'seminar', color: '#f59e0b', emoji: '📝', description: 'Academic research methodologies', credits: 10 },
+    { id: 'w4', time: '09:00 - 10:30', title: 'Cloud Architecture', lecturer: 'Prof. Blue', room: 'Room 201', building: 'Queen Anne', type: 'lecture', color: '#3b82f6', emoji: '☁️', description: 'Advanced cloud design patterns', credits: 15, latitude: 51.4826, longitude: -0.0077 },
+    { id: 'w5', time: '11:00 - 12:00', title: 'Research Methods', lecturer: 'Dr. Gray', room: 'Lecture Hall A', building: 'Queen Anne', type: 'seminar', color: '#f59e0b', emoji: '📝', description: 'Academic research methodologies', credits: 10, latitude: 51.4826, longitude: -0.0077 },
   ],
   Thu: [
-    { id: 'w6', time: '10:00 - 11:30', title: 'Microservices', lecturer: 'Dr. Brown', room: 'CS Lab 1', building: 'Stockwell Street', type: 'lab', color: '#8b5cf6', emoji: '🔧', description: 'Microservices architecture patterns', credits: 15 },
-    { id: 'w7', time: '13:00 - 14:30', title: '5G Networks', lecturer: 'Prof. Silver', room: 'Room 204', building: 'Dreadnought', type: 'lecture', color: '#06b6d4', emoji: '📶', description: 'Next generation wireless networks', credits: 15 },
+    { id: 'w6', time: '10:00 - 11:30', title: 'Microservices', lecturer: 'Dr. Brown', room: 'CS Lab 1', building: 'Stockwell Street', type: 'lab', color: '#8b5cf6', emoji: '🔧', description: 'Microservices architecture patterns', credits: 15, latitude: 51.4834, longitude: -0.0067 },
+    { id: 'w7', time: '13:00 - 14:30', title: '5G Networks', lecturer: 'Prof. Silver', room: 'Room 204', building: 'Dreadnought', type: 'lecture', color: '#06b6d4', emoji: '📶', description: 'Next generation wireless networks', credits: 15, latitude: 51.4829, longitude: -0.0071 },
   ],
   Fri: [
-    { id: 'w8', time: '09:00 - 10:30', title: 'Final Review', lecturer: 'All Staff', room: 'Innovation Lab', building: 'Stockwell Street', type: 'seminar', color: '#10b981', emoji: '✅', description: 'Exam preparation and Q&A', credits: 0 },
+    { id: 'w8', time: '09:00 - 10:30', title: 'Final Review', lecturer: 'All Staff', room: 'Innovation Lab', building: 'Stockwell Street', type: 'seminar', color: '#10b981', emoji: '✅', description: 'Exam preparation and Q&A', credits: 0, latitude: 51.4834, longitude: -0.0067 },
   ],
 };
 
@@ -352,7 +355,7 @@ export default function Timetable() {
         </View>
       </Modal>
 
-      {/* Custom Campus Map Modal */}
+      {/* Live Map Modal with Google Maps */}
       <Modal
         visible={showMapModal}
         animationType="slide"
@@ -367,7 +370,7 @@ export default function Timetable() {
                   <View style={styles.mapHeaderLeft}>
                     <MaterialIcons name="place" size={28} color="#ea4335" />
                     <View>
-                      <Text style={styles.mapModalTitle}>{selectedClass.building} Building</Text>
+                      <Text style={styles.mapModalTitle}>{selectedClass.building}</Text>
                       <Text style={styles.mapModalSubtitle}>📍 {selectedClass.room}</Text>
                     </View>
                   </View>
@@ -379,86 +382,27 @@ export default function Timetable() {
                   </TouchableOpacity>
                 </View>
 
-                {/* Google Maps Style Campus Map */}
-                <ScrollView style={styles.campusMapContainer} showsVerticalScrollIndicator={false}>
-                  <View style={styles.campusMap}>
-                    {/* Map Background - Satellite Style */}
-                    <View style={styles.mapBackground}>
-                      {/* River Thames - Blue */}
-                      <View style={styles.river} />
-                      
-                      {/* Streets - Yellow/Gray */}
-                      <View style={styles.streetHorizontal1} />
-                      <View style={styles.streetHorizontal2} />
-                      <View style={styles.streetVertical} />
-                      
-                      {/* Green Areas - Parks */}
-                      <View style={styles.parkArea1} />
-                      <View style={styles.parkArea2} />
-
-                      {/* Campus Buildings - 3D Style */}
-                      <View style={styles.buildingStockwell}>
-                        <View style={[styles.buildingTop, { backgroundColor: selectedClass.building.includes('Stockwell') ? '#ea4335' : '#7c3aed' }]}>
-                          {selectedClass.building.includes('Stockwell') && (
-                            <MaterialIcons name="place" size={32} color="#fff" />
-                          )}
-                        </View>
-                        <View style={styles.buildingLabel}>
-                          <Text style={styles.buildingLabelText}>Stockwell Street</Text>
-                          <Text style={styles.buildingSubtext}>Computing & IT</Text>
-                        </View>
-                      </View>
-
-                      <View style={styles.buildingQueenAnne}>
-                        <View style={[styles.buildingTop, { backgroundColor: selectedClass.building.includes('Queen') ? '#ea4335' : '#0ea5e9' }]}>
-                          {selectedClass.building.includes('Queen') && (
-                            <MaterialIcons name="place" size={32} color="#fff" />
-                          )}
-                        </View>
-                        <View style={styles.buildingLabel}>
-                          <Text style={styles.buildingLabelText}>Queen Anne</Text>
-                          <Text style={styles.buildingSubtext}>Main Campus</Text>
-                        </View>
-                      </View>
-
-                      <View style={styles.buildingDreadnought}>
-                        <View style={[styles.buildingTop, { backgroundColor: selectedClass.building.includes('Dreadnought') ? '#ea4335' : '#10b981' }]}>
-                          {selectedClass.building.includes('Dreadnought') && (
-                            <MaterialIcons name="place" size={32} color="#fff" />
-                          )}
-                        </View>
-                        <View style={styles.buildingLabel}>
-                          <Text style={styles.buildingLabelText}>Dreadnought</Text>
-                          <Text style={styles.buildingSubtext}>Library & Study</Text>
-                        </View>
-                      </View>
-
-                      {/* Map Labels */}
-                      <View style={styles.riverLabel}>
-                        <Text style={styles.riverLabelText}>River Thames</Text>
-                      </View>
-
-                      {/* Compass */}
-                      <View style={styles.compass}>
-                        <Text style={styles.compassText}>N</Text>
-                        <MaterialIcons name="navigation" size={24} color="#fff" />
-                      </View>
-                    </View>
-                  </View>
-
-                  {/* Directions Card */}
-                  <View style={styles.directionsCard}>
-                    <MaterialIcons name="directions-walk" size={24} color="#0D1140" />
-                    <View style={styles.directionsInfo}>
-                      <Text style={styles.directionsTitle}>Walking Directions</Text>
-                      <Text style={styles.directionsText}>
-                        {selectedClass.building.includes('Stockwell') && '5 min walk from main entrance'}
-                        {selectedClass.building.includes('Queen') && '2 min walk from main entrance'}
-                        {selectedClass.building.includes('Dreadnought') && '3 min walk from main entrance'}
-                      </Text>
-                    </View>
-                  </View>
-                </ScrollView>
+                {/* Real Google Maps */}
+                <MapView
+                  provider={PROVIDER_GOOGLE}
+                  style={styles.map}
+                  initialRegion={{
+                    latitude: selectedClass.latitude,
+                    longitude: selectedClass.longitude,
+                    latitudeDelta: 0.01,
+                    longitudeDelta: 0.01,
+                  }}
+                >
+                  <Marker
+                    coordinate={{
+                      latitude: selectedClass.latitude,
+                      longitude: selectedClass.longitude,
+                    }}
+                    title={selectedClass.building}
+                    description={`${selectedClass.room} - ${selectedClass.title}`}
+                    pinColor={selectedClass.color}
+                  />
+                </MapView>
 
                 <View style={styles.mapFooter}>
                   <MaterialIcons name="location-city" size={20} color="#6b7280" />
@@ -505,14 +449,14 @@ const styles = StyleSheet.create({
   },
   weekSelector: { maxHeight: 70 },
   weekButton: { 
-    paddingHorizontal: 28, 
-    paddingVertical: 16, 
-    marginRight: 12, 
-    borderRadius: 25, 
+    paddingHorizontal: 18, 
+    paddingVertical: 12, 
+    marginRight: 10, 
+    borderRadius: 20, 
     backgroundColor: '#f8f9fb',
-    borderWidth: 3,
+    borderWidth: 2,
     borderColor: '#0D1140',
-    minWidth: 140,
+    minWidth: 100,
     alignItems: 'center',
     position: 'relative',
   },
@@ -520,14 +464,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#0D1140',
     borderColor: '#0D1140',
   },
-  weekText: { fontSize: 16, fontWeight: '800', color: '#0D1140' },
+  weekText: { fontSize: 14, fontWeight: '700', color: '#0D1140' },
   weekTextActive: { color: '#fff' },
   weekButtonIndicator: {
     position: 'absolute',
     bottom: -2,
     left: '25%',
     right: '25%',
-    height: 4,
+    height: 3,
     backgroundColor: '#8b5cf6',
     borderRadius: 2,
   },
@@ -581,7 +525,7 @@ const styles = StyleSheet.create({
   reminderButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 16, borderRadius: 16, backgroundColor: '#f8f9fb' },
   reminderButtonText: { fontSize: 16, fontWeight: '700', color: '#0D1140' },
 
-  // Map Modal Styles - Google Maps Design
+  // Map Modal Styles
   mapModalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.8)' },
   mapModalContent: { flex: 1, backgroundColor: '#fff', marginTop: 50, borderTopLeftRadius: 20, borderTopRightRadius: 20 },
   mapModalHeader: { 
@@ -600,199 +544,8 @@ const styles = StyleSheet.create({
   mapModalSubtitle: { fontSize: 13, color: '#5f6368', marginTop: 2 },
   mapCloseButton: { padding: 8, backgroundColor: '#f1f3f4', borderRadius: 20 },
   
-  // Google Maps Style Campus Map
-  campusMapContainer: { flex: 1, backgroundColor: '#e5e3df' },
-  campusMap: { 
-    minHeight: 500,
-    backgroundColor: '#e5e3df', 
-    margin: 0,
-    position: 'relative',
-  },
-  mapBackground: {
-    width: '100%',
-    height: '100%',
-    position: 'relative',
-    backgroundColor: '#e5e3df',
-  },
-  
-  // River Thames - Google Maps Water Color
-  river: { 
-    position: 'absolute', 
-    bottom: 0, 
-    left: 0, 
-    right: 0, 
-    height: '25%', 
-    backgroundColor: '#aad3df',
-  },
-  
-  // Streets - Google Maps Style
-  streetHorizontal1: {
-    position: 'absolute',
-    top: '30%',
-    left: 0,
-    right: 0,
-    height: 8,
-    backgroundColor: '#fff',
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
-    borderColor: '#d4d4d4',
-  },
-  streetHorizontal2: {
-    position: 'absolute',
-    top: '60%',
-    left: 0,
-    right: 0,
-    height: 8,
-    backgroundColor: '#fff',
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
-    borderColor: '#d4d4d4',
-  },
-  streetVertical: {
-    position: 'absolute',
-    left: '50%',
-    top: 0,
-    bottom: '25%',
-    width: 8,
-    backgroundColor: '#fff',
-    borderLeftWidth: 1,
-    borderRightWidth: 1,
-    borderColor: '#d4d4d4',
-  },
-  
-  // Park Areas - Green
-  parkArea1: {
-    position: 'absolute',
-    top: '10%',
-    left: '10%',
-    width: '30%',
-    height: '15%',
-    backgroundColor: '#c8e6c9',
-    borderRadius: 8,
-  },
-  parkArea2: {
-    position: 'absolute',
-    top: '45%',
-    right: '10%',
-    width: '25%',
-    height: '12%',
-    backgroundColor: '#c8e6c9',
-    borderRadius: 8,
-  },
-  
-  // Buildings - 3D Google Maps Style
-  buildingStockwell: {
-    position: 'absolute',
-    left: '15%',
-    top: '35%',
-    width: 120,
-  },
-  buildingQueenAnne: {
-    position: 'absolute',
-    left: '55%',
-    top: '40%',
-    width: 120,
-  },
-  buildingDreadnought: {
-    position: 'absolute',
-    left: '60%',
-    top: '15%',
-    width: 120,
-  },
-  buildingTop: {
-    height: 100,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-    elevation: 8,
-  },
-  buildingLabel: {
-    backgroundColor: '#fff',
-    padding: 8,
-    borderRadius: 8,
-    marginTop: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 4,
-  },
-  buildingLabelText: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#202124',
-    textAlign: 'center',
-  },
-  buildingSubtext: {
-    fontSize: 11,
-    color: '#5f6368',
-    textAlign: 'center',
-    marginTop: 2,
-  },
-  
-  // River Label
-  riverLabel: {
-    position: 'absolute',
-    bottom: '10%',
-    alignSelf: 'center',
-    backgroundColor: 'rgba(255,255,255,0.9)',
-    paddingHorizontal: 16,
-    paddingVertical: 6,
-    borderRadius: 12,
-  },
-  riverLabelText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#0288d1',
-  },
-  
-  // Compass
-  compass: {
-    position: 'absolute',
-    top: 20,
-    right: 20,
-    width: 50,
-    height: 50,
-    backgroundColor: '#fff',
-    borderRadius: 25,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 4,
-  },
-  compassText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#ea4335',
-    position: 'absolute',
-    top: 6,
-  },
-  
-  // Directions Card
-  directionsCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 16,
-    backgroundColor: '#fff',
-    margin: 20,
-    padding: 16,
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  directionsInfo: { flex: 1 },
-  directionsTitle: { fontSize: 15, fontWeight: '700', color: '#0D1140', marginBottom: 4 },
-  directionsText: { fontSize: 13, color: '#5f6368' },
+  // Google Maps
+  map: { flex: 1 },
   
   // Map Footer
   mapFooter: { 
