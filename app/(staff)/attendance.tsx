@@ -28,51 +28,53 @@ export default function StaffAttendance() {
       </View>
 
       <ScrollView style={styles.content} contentContainerStyle={{ paddingBottom: insets.bottom + 100 }}>
-        <View style={styles.statsCard}>
-          <Text style={styles.statsTitle}>Today's Overview</Text>
-          <View style={styles.statsGrid}>
-            <View style={styles.statItem}>
-              <Text style={styles.statValue}>3</Text>
-              <Text style={styles.statLabel}>Classes</Text>
-            </View>
-            <View style={styles.statItem}>
-              <Text style={styles.statValue}>117</Text>
-              <Text style={styles.statLabel}>Present</Text>
-            </View>
-            <View style={styles.statItem}>
-              <Text style={styles.statValue}>8</Text>
-              <Text style={styles.statLabel}>Absent</Text>
-            </View>
-            <View style={styles.statItem}>
-              <Text style={styles.statValue}>93.6%</Text>
-              <Text style={styles.statLabel}>Rate</Text>
+        <View style={styles.whiteSection}>
+          <View style={styles.statsCard}>
+            <Text style={styles.statsTitle}>Today's Overview</Text>
+            <View style={styles.statsGrid}>
+              <View style={styles.statItem}>
+                <Text style={styles.statValue}>3</Text>
+                <Text style={styles.statLabel}>Classes</Text>
+              </View>
+              <View style={styles.statItem}>
+                <Text style={styles.statValue}>117</Text>
+                <Text style={styles.statLabel}>Present</Text>
+              </View>
+              <View style={styles.statItem}>
+                <Text style={styles.statValue}>8</Text>
+                <Text style={styles.statLabel}>Absent</Text>
+              </View>
+              <View style={styles.statItem}>
+                <Text style={styles.statValue}>93.6%</Text>
+                <Text style={styles.statLabel}>Rate</Text>
+              </View>
             </View>
           </View>
-        </View>
 
-        <Text style={styles.sectionTitle}>Recent Records</Text>
-        {attendanceRecords.map((record) => (
-          <TouchableOpacity key={record.id} style={styles.recordCard}>
-            <View style={styles.recordHeader}>
-              <Text style={styles.recordClass}>{record.className}</Text>
-              <Text style={styles.recordDate}>{record.date}</Text>
-            </View>
-            <View style={styles.recordStats}>
-              <View style={styles.recordStat}>
-                <View style={[styles.recordDot, { backgroundColor: '#4CAF50' }]} />
-                <Text style={styles.recordStatText}>{record.present} Present</Text>
+          <Text style={styles.sectionTitle}>Recent Records</Text>
+          {attendanceRecords.map((record) => (
+            <TouchableOpacity key={record.id} style={styles.recordCard}>
+              <View style={styles.recordHeader}>
+                <Text style={styles.recordClass}>{record.className}</Text>
+                <Text style={styles.recordDate}>{record.date}</Text>
               </View>
-              <View style={styles.recordStat}>
-                <View style={[styles.recordDot, { backgroundColor: '#f44336' }]} />
-                <Text style={styles.recordStatText}>{record.absent} Absent</Text>
+              <View style={styles.recordStats}>
+                <View style={styles.recordStat}>
+                  <View style={[styles.recordDot, { backgroundColor: '#4CAF50' }]} />
+                  <Text style={styles.recordStatText}>{record.present} Present</Text>
+                </View>
+                <View style={styles.recordStat}>
+                  <View style={[styles.recordDot, { backgroundColor: '#f44336' }]} />
+                  <Text style={styles.recordStatText}>{record.absent} Absent</Text>
+                </View>
+                <View style={styles.recordStat}>
+                  <MaterialIcons name="people" size={16} color="#6b7280" />
+                  <Text style={styles.recordStatText}>{record.total} Total</Text>
+                </View>
               </View>
-              <View style={styles.recordStat}>
-                <MaterialIcons name="people" size={16} color="#8891b8" />
-                <Text style={styles.recordStatText}>{record.total} Total</Text>
-              </View>
-            </View>
-          </TouchableOpacity>
-        ))}
+            </TouchableOpacity>
+          ))}
+        </View>
       </ScrollView>
     </View>
   );
@@ -83,20 +85,21 @@ const styles = StyleSheet.create({
   header: { paddingHorizontal: 16, paddingBottom: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   headerTitle: { fontSize: 24, fontWeight: '800', color: '#fff' },
   scanButton: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
-  content: { flex: 1, paddingHorizontal: 16 },
-  statsCard: { backgroundColor: '#151a42', borderRadius: 16, padding: 20, marginBottom: 24 },
-  statsTitle: { fontSize: 18, fontWeight: '700', color: '#fff', marginBottom: 16 },
+  content: { flex: 1 },
+  whiteSection: { backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, paddingTop: 24, paddingHorizontal: 16, minHeight: '100%' },
+  statsCard: { backgroundColor: '#f8f9fb', borderRadius: 16, padding: 20, marginBottom: 24 },
+  statsTitle: { fontSize: 18, fontWeight: '700', color: '#0D1140', marginBottom: 16 },
   statsGrid: { flexDirection: 'row', justifyContent: 'space-between' },
   statItem: { alignItems: 'center' },
-  statValue: { fontSize: 24, fontWeight: '800', color: '#fff', marginBottom: 4 },
-  statLabel: { fontSize: 12, color: '#8891b8' },
-  sectionTitle: { fontSize: 18, fontWeight: '700', color: '#fff', marginBottom: 12 },
-  recordCard: { backgroundColor: '#151a42', borderRadius: 16, padding: 16, marginBottom: 12 },
+  statValue: { fontSize: 24, fontWeight: '800', color: '#0D1140', marginBottom: 4 },
+  statLabel: { fontSize: 12, color: '#6b7280' },
+  sectionTitle: { fontSize: 18, fontWeight: '700', color: '#0D1140', marginBottom: 12 },
+  recordCard: { backgroundColor: '#f8f9fb', borderRadius: 16, padding: 16, marginBottom: 12 },
   recordHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
-  recordClass: { fontSize: 16, fontWeight: '700', color: '#fff' },
-  recordDate: { fontSize: 13, color: '#8891b8' },
+  recordClass: { fontSize: 16, fontWeight: '700', color: '#0D1140' },
+  recordDate: { fontSize: 13, color: '#6b7280' },
   recordStats: { flexDirection: 'row', gap: 16 },
   recordStat: { flexDirection: 'row', alignItems: 'center' },
   recordDot: { width: 8, height: 8, borderRadius: 4, marginRight: 6 },
-  recordStatText: { fontSize: 13, color: '#9aa0c7', marginLeft: 4 },
+  recordStatText: { fontSize: 13, color: '#6b7280', marginLeft: 4 },
 });

@@ -1,8 +1,7 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
-import { Alert, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import { Alert, Modal, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type DaySchedule = {
@@ -100,6 +99,11 @@ export default function Timetable() {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showMapModal, setShowMapModal] = useState(false);
   const [selectedClass, setSelectedClass] = useState<DaySchedule | null>(null);
+
+  // Lazy-load native maps only on native platforms
+  const MapViewComp: any = Platform.OS !== 'web' ? require('react-native-maps').default : null;
+  const MarkerComp: any = Platform.OS !== 'web' ? require('react-native-maps').Marker : null;
+  const GOOGLE_PROVIDER: any = Platform.OS !== 'web' ? require('react-native-maps').PROVIDER_GOOGLE : null;
   
   // Get schedule based on selected week
   const getFilteredSchedule = () => {
@@ -382,27 +386,33 @@ export default function Timetable() {
                   </TouchableOpacity>
                 </View>
 
-                {/* Real Google Maps */}
-                <MapView
-                  provider={PROVIDER_GOOGLE}
-                  style={styles.map}
-                  initialRegion={{
-                    latitude: selectedClass.latitude,
-                    longitude: selectedClass.longitude,
-                    latitudeDelta: 0.01,
-                    longitudeDelta: 0.01,
-                  }}
-                >
-                  <Marker
-                    coordinate={{
+                {/* Map (native only) */}
+                {Platform.OS !== 'web' && MapViewComp ? (
+                  <MapViewComp
+                    provider={GOOGLE_PROVIDER}
+                    style={styles.map}
+                    initialRegion={{
                       latitude: selectedClass.latitude,
                       longitude: selectedClass.longitude,
+                      latitudeDelta: 0.01,
+                      longitudeDelta: 0.01,
                     }}
-                    title={selectedClass.building}
-                    description={`${selectedClass.room} - ${selectedClass.title}`}
-                    pinColor={selectedClass.color}
-                  />
-                </MapView>
+                  >
+                    <MarkerComp
+                      coordinate={{
+                        latitude: selectedClass.latitude,
+                        longitude: selectedClass.longitude,
+                      }}
+                      title={selectedClass.building}
+                      description={`${selectedClass.room} - ${selectedClass.title}`}
+                      pinColor={selectedClass.color}
+                    />
+                  </MapViewComp>
+                ) : (
+                  <View style={[styles.map, { alignItems: 'center', justifyContent: 'center' }]}> 
+                    <Text style={{ color: '#6b7280' }}>Map preview not available on web.</Text>
+                  </View>
+                )}
 
                 <View style={styles.mapFooter}>
                   <MaterialIcons name="location-city" size={20} color="#6b7280" />

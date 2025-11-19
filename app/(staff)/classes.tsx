@@ -26,30 +26,32 @@ export default function StaffClasses() {
       </View>
 
       <ScrollView style={styles.content} contentContainerStyle={{ paddingBottom: insets.bottom + 100 }}>
-        {classes.map((cls) => (
-          <TouchableOpacity key={cls.id} style={styles.classCard}>
-            <View style={styles.classHeader}>
-              <View style={styles.classIconWrap}>
-                <MaterialIcons name="class" size={24} color="#fff" />
+        <View style={styles.whiteSection}>
+          {classes.map((cls) => (
+            <TouchableOpacity key={cls.id} style={styles.classCard}>
+              <View style={styles.classHeader}>
+                <View style={styles.classIconWrap}>
+                  <MaterialIcons name="class" size={24} color="#fff" />
+                </View>
+                <View style={styles.classInfo}>
+                  <Text style={styles.className}>{cls.name}</Text>
+                  <Text style={styles.classCode}>{cls.code}</Text>
+                </View>
               </View>
-              <View style={styles.classInfo}>
-                <Text style={styles.className}>{cls.name}</Text>
-                <Text style={styles.classCode}>{cls.code}</Text>
+              <Text style={styles.classSchedule}>{cls.schedule}</Text>
+              <View style={styles.classFooter}>
+                <View style={styles.classStudents}>
+                  <MaterialIcons name="people" size={18} color="#6b7280" />
+                  <Text style={styles.classStudentsText}>{cls.students} students</Text>
+                </View>
+                <TouchableOpacity style={styles.classAction}>
+                  <Text style={styles.classActionText}>View Details</Text>
+                  <MaterialIcons name="chevron-right" size={20} color="#3b4a9e" />
+                </TouchableOpacity>
               </View>
-            </View>
-            <Text style={styles.classSchedule}>{cls.schedule}</Text>
-            <View style={styles.classFooter}>
-              <View style={styles.classStudents}>
-                <MaterialIcons name="people" size={18} color="#8891b8" />
-                <Text style={styles.classStudentsText}>{cls.students} students</Text>
-              </View>
-              <TouchableOpacity style={styles.classAction}>
-                <Text style={styles.classActionText}>View Details</Text>
-                <MaterialIcons name="chevron-right" size={20} color="#3b4a9e" />
-              </TouchableOpacity>
-            </View>
-          </TouchableOpacity>
-        ))}
+            </TouchableOpacity>
+          ))}
+        </View>
       </ScrollView>
     </View>
   );
@@ -60,17 +62,18 @@ const styles = StyleSheet.create({
   header: { paddingHorizontal: 16, paddingBottom: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   headerTitle: { fontSize: 24, fontWeight: '800', color: '#fff' },
   addButton: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
-  content: { flex: 1, paddingHorizontal: 16 },
-  classCard: { backgroundColor: '#151a42', borderRadius: 16, padding: 16, marginBottom: 12 },
+  content: { flex: 1 },
+  whiteSection: { backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, paddingTop: 24, paddingHorizontal: 16, minHeight: '100%' },
+  classCard: { backgroundColor: '#f8f9fb', borderRadius: 16, padding: 16, marginBottom: 12 },
   classHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
   classIconWrap: { width: 48, height: 48, borderRadius: 12, backgroundColor: '#3b4a9e', alignItems: 'center', justifyContent: 'center', marginRight: 12 },
   classInfo: { flex: 1 },
-  className: { fontSize: 18, fontWeight: '700', color: '#fff', marginBottom: 2 },
-  classCode: { fontSize: 13, color: '#8891b8' },
-  classSchedule: { fontSize: 14, color: '#9aa0c7', marginBottom: 12 },
+  className: { fontSize: 18, fontWeight: '700', color: '#0D1140', marginBottom: 2 },
+  classCode: { fontSize: 13, color: '#6b7280' },
+  classSchedule: { fontSize: 14, color: '#6b7280', marginBottom: 12 },
   classFooter: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   classStudents: { flexDirection: 'row', alignItems: 'center' },
-  classStudentsText: { fontSize: 14, color: '#8891b8', marginLeft: 6 },
+  classStudentsText: { fontSize: 14, color: '#6b7280', marginLeft: 6 },
   classAction: { flexDirection: 'row', alignItems: 'center' },
   classActionText: { fontSize: 14, fontWeight: '600', color: '#3b4a9e', marginRight: 4 },
 });

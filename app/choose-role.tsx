@@ -1,9 +1,9 @@
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function ChooseRole() {
   const router = useRouter();
@@ -66,9 +66,9 @@ export default function ChooseRole() {
         </TouchableOpacity>
       </View>
 
-      <Text style={styles.footer}>
-        By continuing, you agree to our Terms of Service and Privacy Policy
-      </Text>
+        <Text style={styles.footer}>
+          By continuing, you agree to our Terms of Service and Privacy Policy
+        </Text>
     </View>
   );
 }
@@ -81,33 +81,34 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    marginBottom: 40,
+    marginBottom: 32,
   },
   logo: {
-    width: 120,
-    height: 120,
+    width: 100,
+    height: 100,
     tintColor: '#fff',
-    marginBottom: 24,
+    marginBottom: 20,
   },
   title: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: '800',
     color: '#fff',
     marginBottom: 8,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 15,
     color: '#9aa0c7',
     textAlign: 'center',
   },
   cardsContainer: {
     flex: 1,
-    gap: 20,
+    gap: 16,
+    paddingBottom: 20,
   },
   roleCard: {
     backgroundColor: '#151a42',
     borderRadius: 20,
-    padding: 28,
+    padding: 24,
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
@@ -116,39 +117,39 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   iconWrap: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
+    width: 80,
+    height: 80,
+    borderRadius: 40,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 20,
-  },
-  roleTitle: {
-    fontSize: 24,
-    fontWeight: '800',
-    color: '#fff',
-    marginBottom: 12,
-  },
-  roleDescription: {
-    fontSize: 15,
-    color: '#9aa0c7',
-    textAlign: 'center',
-    lineHeight: 22,
     marginBottom: 16,
   },
+  roleTitle: {
+    fontSize: 22,
+    fontWeight: '800',
+    color: '#fff',
+    marginBottom: 10,
+  },
+  roleDescription: {
+    fontSize: 14,
+    color: '#9aa0c7',
+    textAlign: 'center',
+    lineHeight: 20,
+    marginBottom: 12,
+  },
   arrow: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: 'rgba(255,255,255,0.1)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   footer: {
-    fontSize: 12,
+    fontSize: 11,
     color: '#6b7598',
     textAlign: 'center',
-    marginTop: 24,
-    marginBottom: 24,
+    marginTop: 16,
+    marginBottom: 20,
   },
 });
